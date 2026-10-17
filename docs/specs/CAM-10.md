@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-10/rename-the-installed-agents-
 branch: camerondhobbs/cam-10-rename-agents-to-codeangel
 base_sha: 87a707d5c869eccdf432c835de1f311b82e0d979
 pr: https://github.com/camalpha-lgtm/codeangel/pull/2
-stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: pass  # exit status that entered the current stage
+stage: DONE  # managed by transition.py — see stages.toml
+last_status: learned  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T15:14Z
-updated: 2026-10-17T15:18Z
+updated: 2026-10-17T15:20Z
 ---
 
 # CAM-10: Rename the installed .agents folder to .codeangel
@@ -185,13 +185,19 @@ Refined by build-loop STARTUP (Linear title/description rewritten; original kept
 ## Review
 - PR: https://github.com/camalpha-lgtm/codeangel/pull/2
 - CI runs: <!-- <run id> <sha> <conclusion> -->
+  - 39044447235 833b3a9 success
+  - 39044459914 475c900 success
 - Ready for review: <UTC time | not marked: reason>
 
 ## Learnings
 <!-- - <area>/docs/learnings/<file>.md or <area>/docs/ai/<file>.md: <entry added/updated/deleted> | none: <why> -->
+- docs/learnings/tooling.md: added two entries (rename the skills folder → delete stale shims before sync; autocrlf makes git status show CRLF-only modifications)
 
 ## Log
 - 2026-10-17T15:14Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-10-rename-agents-to-codeangel, base=87a707d5c8
 - 2026-10-17T15:15Z PLAN → IMPLEMENT [planned] attempt=0/5
 - 2026-10-17T15:17Z IMPLEMENT → VERIFY [implemented] attempt=0/5
 - 2026-10-17T15:18Z VERIFY → REVIEW [pass] attempt=0/5
+- 2026-10-17T15:19Z REVIEW → REVIEW [waiting_ci] attempt=0/5
+- 2026-10-17T15:20Z REVIEW → LEARN [ci_green] attempt=0/5
+- 2026-10-17T15:20Z LEARN → DONE [learned] attempt=0/5
