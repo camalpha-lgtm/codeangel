@@ -1,0 +1,42 @@
+
+# ── {{area}}/ (django + drf) ──────────────────────────────────────────────────
+
+[[rule]]
+paths = ["{{area}}/*/views.py", "{{area}}/*/urls.py", "{{area}}/*/serializers.py", "{{area}}/*/permissions.py", "{{area}}/{{package}}/urls.py"]
+docs = ["{{area}}/docs/ai/architecture.md"]
+why = "live route table; auth / pagination notes"
+
+[[rule]]
+paths = ["{{area}}/*/models.py", "{{area}}/*/choices.py", "{{area}}/*/migrations/*"]
+docs = ["{{area}}/docs/ai/architecture.md", "docs/ai/product.md"]
+why = "per-app entity list; what the product stores and offers"
+
+[[rule]]
+paths = ["{{area}}/{{package}}/settings.py"]
+docs = ["{{area}}/docs/ai/architecture.md", "{{area}}/docs/ai/conventions.md", "README.md"]
+why = "installed apps + layout, DRF defaults (auth, permissions, pagination), env config, setup"
+
+[[rule]]
+paths = ["{{area}}/pyproject.toml", "{{area}}/poetry.lock"]
+docs = ["{{area}}/AGENTS.md", "{{area}}/docs/ai/commands.md", "README.md"]
+why = "stack line, setup + dependencies, quick start"
+
+[[rule]]
+paths = ["{{area}}/.pre-commit-config.yaml", "{{area}}/pytest.ini"]
+docs = ["{{area}}/docs/ai/commands.md", "{{area}}/docs/ai/testing.md"]
+why = "lint hook list, test invocation"
+
+[[rule]]
+paths = ["{{area}}/core/*"]
+docs = ["{{area}}/docs/ai/architecture.md", "{{area}}/docs/ai/testing.md"]
+why = "core/ layout: BaseModel, BaseTest, shared utilities"
+
+[[rule]]
+paths = ["{{area}}/*/tests/base.py", "{{area}}/*/tests/*/base.py"]
+docs = ["{{area}}/docs/ai/testing.md"]
+why = "shared test fixtures"
+
+[[rule]]
+paths = ["{{area}}/*/management/commands/*"]
+docs = ["{{area}}/docs/ai/commands.md"]
+why = "management-command table"

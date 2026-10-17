@@ -1,0 +1,13 @@
+# codeangel preset metadata (not copied). Template vars: {{area}}, {{area_name}}, {{project_name}}, {{project_package}}, {{base_branch}}, plus [vars].
+description = "Expo / React Native app (TypeScript): docs, gates, SDK-version discipline, CI"
+summary = "Expo / React Native app (TypeScript)"
+quick_start = "`cd {{area}}` → `npm install` → `npx expo start`"
+requires = "create the Expo app first, then add the preset: `npx create-expo-app@latest {{area}} --template blank-typescript` (it refuses a non-empty directory)"
+next = "`cd {{area}}` → `npm install` → `npx expo start`; read the SDK docs named in {{area}}/AGENTS.md before writing Expo code"
+ci = "| `{{area_name}}.yml` | {{area}}/: type check, lint |"
+
+[vars]
+
+[area]
+requires_files = ["package.json"]
+pre_remove = []

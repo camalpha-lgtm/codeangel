@@ -1,0 +1,25 @@
+# codeangel project config — read by the build-loop skills and scripts. Project-owned: edit freely.
+# Reference: docs/ai/agent-docs.md (managed by codeangel).
+
+[codeangel]
+version = "{{codeangel_version}}"  # set by `codeangel init` / `codeangel update`
+
+[project]
+name = "{{project_name}}"
+base_branch = "{{base_branch}}"
+ticket_pattern = '^[A-Z][A-Z0-9]+-\d+$'  # tracker IDs, e.g. Linear CAM-5
+spec_dir = "docs/specs"                  # build-loop spec + progress log per ticket
+doc_map = "docs/ai/doc-map.toml"         # which docs describe which code
+
+[runtime]
+python = {{python_toml}}  # Python >= 3.11 that runs .agents scripts (Windows: "py -3.12"; macOS / Linux: "python3")
+
+[worktrees]
+# Ignored files worktree-cleanup may delete with a merged worktree. Anything else blocks removal.
+disposable = [
+  ".venv/", "venv/", "__pycache__/", ".pytest_cache/", ".ruff_cache/", ".mypy_cache/",
+  "node_modules/", ".expo/", "dist/", "build/", "*.pyc", "*.sqlite3", ".coverage", "htmlcov/",
+]
+
+# Areas — `codeangel add <preset> <path>` appends one [[areas]] block per area.
+# Keys: name, path, preset, pre_remove (commands worktree-cleanup runs first; {worktree} = worktree path).

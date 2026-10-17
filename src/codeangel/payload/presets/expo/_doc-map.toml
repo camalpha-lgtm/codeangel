@@ -1,0 +1,12 @@
+
+# ── {{area}}/ (expo) ──────────────────────────────────────────────────────────
+
+[[rule]]
+paths = ["{{area}}/package.json", "{{area}}/app.json", "{{area}}/app.config.*", "{{area}}/tsconfig.json", "{{area}}/eslint.config.*", "{{area}}/babel.config.*", "{{area}}/metro.config.*"]
+docs = ["{{area}}/docs/ai/stack.md", "{{area}}/AGENTS.md", "README.md"]
+why = "SDK + stack, scripts, gates, quick start"
+
+[[rule]]
+paths = ["{{area}}/App.tsx", "{{area}}/index.ts", "{{area}}/app/*", "{{area}}/src/*", "{{area}}/components/*"]
+docs = ["{{area}}/docs/ai/stack.md"]
+why = "layout / navigation map; base URL + endpoints the app uses"

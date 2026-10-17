@@ -1,0 +1,12 @@
+# codeangel preset metadata (not copied). Template vars: {{area}}, {{area_name}}, {{project_name}}, {{project_package}}, {{base_branch}}, plus [vars].
+description = "Django + Django REST Framework API: poetry, pytest-django, drf-spectacular, ruff, prek; project skeleton, docs, gates, CI, core/ base classes"
+summary = "Django + Django REST Framework API · poetry project"
+quick_start = "`cd {{area}}` → `poetry env use <python3.12 exe>` → `poetry install` → `poetry run python manage.py migrate` → `poetry run python manage.py runserver`"
+next = "set up the env: `cd {{area}}` → `poetry env use <python3.12 exe>` → `poetry install` → `poetry run python manage.py check` → `poetry run pytest -q`; interactive API docs at /api/docs/ once the server runs"
+ci = "| `{{area_name}}.yml` | {{area}}/: lint (prek), schema drift, tests |"
+
+[vars]
+package = "{{project_package}}"  # Django settings package (override: --var package=<name>)
+
+[area]
+pre_remove = ["poetry -C {worktree}/{{area}} env remove --all"]

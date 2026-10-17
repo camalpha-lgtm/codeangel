@@ -1,0 +1,50 @@
+name: {{area_name}}
+
+on:
+  pull_request:
+    paths: ["{{area}}/**", ".github/workflows/{{area_name}}.yml"]
+  push:
+    branches: [{{base_branch}}]
+    paths: ["{{area}}/**", ".github/workflows/{{area_name}}.yml"]
+
+concurrency:
+  group: {{area_name}}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: {{area}}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      # Keep this equal to the poetry you use locally (lock-file format).
+      - name: Install poetry
+        run: pipx install poetry==1.8.2
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Lint and format changed files (prek)
+        if: github.event_name == 'pull_request'
+        run: >
+          poetry run prek run --show-diff-on-failure
+          --from-ref origin/${{ github.base_ref }} --to-ref HEAD
+
+      - name: Lint and format all files (prek)
+        if: github.event_name == 'push'
+        run: poetry run prek run --all-files --show-diff-on-failure
+
+      - name: Check for missing migrations
+        run: poetry run python manage.py makemigrations --check --dry-run
+
+      - name: Tests
+        run: poetry run pytest -q
