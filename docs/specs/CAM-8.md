@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-8/install-default-cursor-and-cl
 branch: camerondhobbs/cam-8-install-default-cursor-and-claude-mcp-configs-into-child
 base_sha: c3b9736dcb3e3eedd1aacb078ca722b3480e9c5d
 pr: https://github.com/camalpha-lgtm/codeangel/pull/4
-stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: waiting_ci  # exit status that entered the current stage
+stage: DONE  # managed by transition.py — see stages.toml
+last_status: learned  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T15:55Z
-updated: 2026-10-17T16:00Z
+updated: 2026-10-17T16:02Z
 ---
 
 # CAM-8: Install default Cursor and Claude MCP configs into child projects
@@ -169,10 +169,12 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 ## Review
 - PR: https://github.com/camalpha-lgtm/codeangel/pull/4
 - CI runs: <!-- <run id> <sha> <conclusion> -->
-- Ready for review: <UTC time | not marked: reason>
+  - 39047481648 3e5b514 success
+- Ready for review: 2026-10-17T16:20Z
 
 ## Learnings
 <!-- - <area>/docs/learnings/<file>.md or <area>/docs/ai/<file>.md: <entry added/updated/deleted> | none: <why> -->
+- none: the one surprise (three test classes in one file) is already a rule in docs/ai/code-standards.md; T docs caught every stale doc, so no doc-map rule was missing; the GitHub MCP being unauthorised here is session state, not a repo fact
 
 ## Log
 - 2026-10-17T15:55Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-8-install-default-cursor-and-claude-mcp-configs-into-child, base=c3b9736dcb
@@ -180,3 +182,5 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 - 2026-10-17T15:58Z IMPLEMENT → VERIFY [implemented] attempt=0/5
 - 2026-10-17T16:00Z VERIFY → REVIEW [pass] attempt=0/5
 - 2026-10-17T16:00Z REVIEW → REVIEW [waiting_ci] attempt=0/5
+- 2026-10-17T16:02Z REVIEW → LEARN [ci_green] attempt=0/5
+- 2026-10-17T16:02Z LEARN → DONE [learned] attempt=0/5
