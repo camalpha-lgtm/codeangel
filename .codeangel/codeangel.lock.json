@@ -4,16 +4,17 @@
     ".claude/agents/build-verifier.md": "7ec42bbbf64cf5b35901fa417f5b13699154604d4c0e003578c16ccfae9849fc",
     ".codeangel/skills/build-implement/SKILL.md": "08ec5cda857d28cd097e97f99f6e172b2201b18458c5d41282c8ab0c82286781",
     ".codeangel/skills/build-learn/SKILL.md": "58766f72d49fcce03c8646148ab32697b4915af54c675886ad65b646f3535a3e",
-    ".codeangel/skills/build-loop/SKILL.md": "4a328a717d04d4c12cafac589a7bed436a2089ea8d13c2d39f0e6ef6857ff158",
+    ".codeangel/skills/build-loop/SKILL.md": "43da1d766fcc2a4d434eb224fb889cc64a19169453ccce3092a78a9e922a51f4",
     ".codeangel/skills/build-loop/assets/spec-template.md": "fbea330a501f9205af090d106e17502792eed1fe4f474e095cead3a06615714f",
-    ".codeangel/skills/build-loop/references/contract.md": "d3a2cf101f55ede871848896cb87ecdcb9f785bc0525fae02341c91ee45733df",
+    ".codeangel/skills/build-loop/references/contract.md": "2431548956870ddb446252bfdceb9af3586920b03bb208d356c2d3b10b1ba71b",
     ".codeangel/skills/build-loop/references/stages.toml": "be173466f8fddce4f5a2dfd32788c9fde67d89bf0ce9c1665835d33b562e0d27",
+    ".codeangel/skills/build-loop/scripts/await_merge.py": "8cb56f4581f754e95ad6491b321470c7c78c174cb0def6f156634b0e88227914",
     ".codeangel/skills/build-loop/scripts/transition.py": "930253ec6ddd08d41b527e818d336336231456ebc3017247c0e49fa7f68cf4d9",
     ".codeangel/skills/build-plan/SKILL.md": "ac755f86734510bd1c8be890ea029e2c7ec8339b82f5fb2114392622c7523bd6",
     ".codeangel/skills/build-review/SKILL.md": "adc699a987f8c4a23ce9a674f5ce310b2ec3ed88cd0a20eab97325fa8fa32188",
     ".codeangel/skills/build-verify/SKILL.md": "3eeba9e1556ce09d78b3c13139ee381fd0bc4e4094d7741091467b8e3f1305d6",
     ".codeangel/skills/worktree-cleanup/SKILL.md": "19728241d00204edcc9bfb0ee8d93566a496e55f97aca1aebb83b419acee18a9",
     ".codeangel/sync-shims.py": "54ddf167aa32ba71185fb4ae53c0b37883e55f65284cedd3adf7db2e31a423d7",
-    "docs/ai/agent-docs.md": "644482f5d57a2902bbf6438501dd117b9656db96e7dcaf6e3ad206e1403639f6"
+    "docs/ai/agent-docs.md": "89fde614e34e611357c326f6953188a004a7e5a826b15885d21ba36b407c6d58"
   }
 }

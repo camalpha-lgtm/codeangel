@@ -12,6 +12,7 @@ PYTHON = f'"{sys.executable}"' if " " in sys.executable else sys.executable
 VAR_RE = re.compile(r"\{\{[a-z_]+\}\}")
 OLD_FOLDER = "." + "agents"
 TRANSITION = ".codeangel/skills/build-loop/scripts/transition.py"
+AWAIT_MERGE = ".codeangel/skills/build-loop/scripts/await_merge.py"
 
 
 def run(root: Path, *args: str) -> int:
@@ -27,12 +28,21 @@ def text_files(root: Path) -> list[Path]:
     ]
 
 
-def load_transition(root: Path):
-    spec = importlib.util.spec_from_file_location("transition", root / TRANSITION)
+def load_script(root: Path, relative: str):
+    spec = importlib.util.spec_from_file_location(Path(relative).stem, root / relative)
     module = importlib.util.module_from_spec(spec)
     assert spec is not None and spec.loader is not None
-    spec.loader.exec_module(module)
+    previous = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.dont_write_bytecode = previous
     return module
+
+
+def load_transition(root: Path):
+    return load_script(root, TRANSITION)
 
 
 def transition(root: Path, *args: str) -> subprocess.CompletedProcess[str]:

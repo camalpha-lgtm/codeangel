@@ -3,7 +3,7 @@
 An agent-agnostic AI software factory you install into any repo. One command gives a project:
 
 - **Skills** in the open [Agent Skills](https://agentskills.io/specification) format (`.codeangel/skills/`), readable by Claude Code, Cursor and Codex: a `build-loop` coordinator plus one skill per stage (`build-plan`, `build-implement`, `build-verify`, `build-review`, `build-learn`) and `worktree-cleanup`.
-- **An enforced build loop.** A state machine (`stages.toml` + `transition.py`) takes a ticket from plan to implement to verify to review to learn. It refuses illegal moves and unmet checks, and `plan` / `immediate` modes let you approve a plan before any code is written. Verification runs in an isolated subagent.
+- **An enforced build loop.** A state machine (`stages.toml` + `transition.py`) takes a ticket from plan to implement to verify to review to learn. It refuses illegal moves and unmet checks, and `plan` / `immediate` modes let you approve a plan before any code is written. Verification runs in an isolated subagent. For Linear tickets it also moves the ticket to In Progress when planning starts and to Done once the PR is merged (a script polls GitHub every 5 minutes for up to 2 hours; no model calls while waiting).
 - **Self-maintaining agent docs.** Small `AGENTS.md` routers per area, `docs/ai/` reference, learnings, and a doc map so docs are updated in the same PR as the code they describe — the loop refuses to pass verification otherwise.
 - **Presets** for common areas: `django-drf` (Django + Django REST Framework API) and `expo` (React Native).
 
