@@ -18,9 +18,9 @@
 ## CI — `.github/workflows/`
 | workflow | runs |
 |---|---|
-| `agents.yml` | Claude skill shims in sync with `.agents/skills` (`python .agents/sync-shims.py --check`) |
+| `agents.yml` | Claude skill shims in sync with `.codeangel/skills` (`python .codeangel/sync-shims.py --check`) |
 <!-- codeangel:ci — `codeangel add` inserts a row per area workflow above this line; add other workflows by hand (the doc map flags this table when workflows change) -->
 
 ## Worktrees
 - Agent hosts (T3 Code, Claude Code, Codex, Cursor) may create one worktree per task; each area's `<area>/docs/ai/commands.md` lists its per-worktree setup.
-- Worktrees of merged PRs: `.agents/skills/worktree-cleanup/SKILL.md` (also runs at build-loop startup).
+- Worktrees of merged PRs: `.codeangel/skills/worktree-cleanup/SKILL.md` (also runs at build-loop startup).

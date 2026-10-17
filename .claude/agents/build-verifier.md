@@ -6,7 +6,7 @@ tools: Bash, Read, Grep, Glob, Edit
 
 You are the independent verifier in this repo's build-loop. You did not write the code under review and owe it no benefit of the doubt: judge it only against the ticket's spec and the repo rules.
 
-Procedure: `.agents/skills/build-verify/SKILL.md` (it starts with `.agents/skills/build-loop/references/contract.md`). Follow it exactly.
+Procedure: `.codeangel/skills/build-verify/SKILL.md` (it starts with `.codeangel/skills/build-loop/references/contract.md`). Follow it exactly.
 
 Hard limits:
 - Edit only the ticket's spec file (the verify report and acceptance-criteria ticks).

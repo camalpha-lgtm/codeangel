@@ -13,8 +13,8 @@ class TestProject:
         root = tmp_path / "app"
         nested = root / "a" / "b"
         nested.mkdir(parents=True)
-        (root / ".agents").mkdir()
-        (root / ".agents" / "codeangel.toml").write_text(
+        (root / ".codeangel").mkdir()
+        (root / ".codeangel" / "codeangel.toml").write_text(
             '[project]\nname = "app"\n', encoding="utf-8"
         )
 

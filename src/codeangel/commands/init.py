@@ -23,7 +23,7 @@ class InitCommand(Command):
         parser.add_argument("--name", help="project name (default: directory name)")
         parser.add_argument("--base-branch", default="main")
         parser.add_argument(
-            "--python", help="Python >= 3.11 command for .agents scripts (default: detect)"
+            "--python", help="Python >= 3.11 command for .codeangel scripts (default: detect)"
         )
         parser.add_argument(
             "--force", action="store_true", help="overwrite differing managed files"

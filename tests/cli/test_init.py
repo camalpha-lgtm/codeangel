@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from support import PYTHON, VAR_RE, run, text_files
+from support import OLD_FOLDER, PYTHON, VAR_RE, run, text_files
 
 from codeangel.install.lockfile import Lockfile
 from codeangel.install.tree import PAYLOAD, PayloadTree
@@ -10,14 +10,26 @@ from codeangel.install.tree import PAYLOAD, PayloadTree
 
 class TestInit:
     def test_installs_managed_scaffold_and_shims(self, project: Path):
-        assert (project / ".agents/skills/build-loop/SKILL.md").is_file()
-        assert (project / ".agents/skills/build-loop/references/stages.toml").is_file()
-        assert (project / ".agents/sync-shims.py").is_file()
+        assert (project / ".codeangel/skills/build-loop/SKILL.md").is_file()
+        assert (project / ".codeangel/skills/build-loop/references/stages.toml").is_file()
+        assert (project / ".codeangel/sync-shims.py").is_file()
         assert (project / ".claude/skills/build-plan/SKILL.md").is_file()
         assert (project / ".claude/agents/build-verifier.md").is_file()
         assert "my-app" in (project / "AGENTS.md").read_text(encoding="utf-8")
-        assert 'name = "my-app"' in (project / ".agents/codeangel.toml").read_text(encoding="utf-8")
+        assert 'name = "my-app"' in (project / ".codeangel/codeangel.toml").read_text(
+            encoding="utf-8"
+        )
         assert (project / ".gitignore").is_file()
+
+    def test_installs_codeangel_folder_and_no_agents_folder(self, project: Path):
+        for name in (
+            "codeangel.toml",
+            "codeangel.lock.json",
+            "sync-shims.py",
+            "skills/build-loop/SKILL.md",
+        ):
+            assert (project / ".codeangel" / name).is_file()
+        assert not (project / OLD_FOLDER).exists()
 
     def test_lock_covers_every_managed_file(self, project: Path):
         locked = set(Lockfile(project).load())

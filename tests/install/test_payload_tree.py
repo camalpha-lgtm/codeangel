@@ -7,7 +7,9 @@ from codeangel.install.tree import PayloadTree
 
 class TestPayloadTree:
     def test_dot_prefixed_parts_install_as_hidden_paths(self):
-        assert PayloadTree.install_path(PurePosixPath("dot_agents/x")).as_posix() == ".agents/x"
+        assert (
+            PayloadTree.install_path(PurePosixPath("dot_codeangel/x")).as_posix() == ".codeangel/x"
+        )
 
     def test_files_skip_bytecode_caches(self, tmp_path: Path):
         cache = tmp_path / "__pycache__"

@@ -7,8 +7,8 @@
 | `README.md` | human entry point: what it is, quick start, how to drive agents | `docs/ai/agent-docs.md` |
 | `docs/ai/` | cross-cutting agent reference; `doc-map.toml` = which docs describe which code | this dir |
 | `docs/learnings/` | cross-cutting learnings + index of every area's learnings | `docs/learnings/README.md` |
-| `docs/specs/<TICKET>.md` | build-loop spec + progress log, one per ticket | `.agents/skills/build-loop/SKILL.md` |
-| `.agents/` | `codeangel.toml` (project config) · `skills/` (canonical agent skills) · `sync-shims.py` | `docs/ai/agent-docs.md` → Skills |
+| `docs/specs/<TICKET>.md` | build-loop spec + progress log, one per ticket | `.codeangel/skills/build-loop/SKILL.md` |
+| `.codeangel/` | `codeangel.toml` (project config) · `skills/` (canonical agent skills) · `sync-shims.py` | `docs/ai/agent-docs.md` → Skills |
 | `.claude/skills/`, `.claude/agents/` | GENERATED Claude Code skill shims · Claude subagents | `docs/ai/agent-docs.md` → Skills |
 | `.github/workflows/` | CI | `docs/ai/git-workflow.md` |
 <!-- codeangel:areas — `codeangel add <preset> <path>` inserts rows above this line -->

@@ -28,13 +28,13 @@ class TestVersioning:
         import json
 
         del backend_project
-        config = (project / ".agents/codeangel.toml").read_text(encoding="utf-8")
-        lock = json.loads((project / ".agents/codeangel.lock.json").read_text(encoding="utf-8"))
+        config = (project / ".codeangel/codeangel.toml").read_text(encoding="utf-8")
+        lock = json.loads((project / ".codeangel/codeangel.lock.json").read_text(encoding="utf-8"))
         assert f'version = "{__version__}"' in config
         assert lock["codeangel"] == __version__
         assert run(project, "update") == 0
-        config = (project / ".agents/codeangel.toml").read_text(encoding="utf-8")
-        lock = json.loads((project / ".agents/codeangel.lock.json").read_text(encoding="utf-8"))
+        config = (project / ".codeangel/codeangel.toml").read_text(encoding="utf-8")
+        lock = json.loads((project / ".codeangel/codeangel.lock.json").read_text(encoding="utf-8"))
         assert f'version = "{__version__}"' in config
         assert lock["codeangel"] == __version__
 
@@ -43,7 +43,7 @@ class TestVersioning:
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         assert "uv tool install git+https://github.com/camalpha-lgtm/codeangel@v" in readme
         assert "[codeangel] version" in readme
-        assert ".agents/codeangel.toml" in readme
+        assert ".codeangel/codeangel.toml" in readme
         assert "codeangel doctor" in readme
         assert "warns" in readme
         assert "vX.Y.Z" in agents

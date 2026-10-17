@@ -10,7 +10,8 @@ from codeangel.cli import main
 
 PYTHON = f'"{sys.executable}"' if " " in sys.executable else sys.executable
 VAR_RE = re.compile(r"\{\{[a-z_]+\}\}")
-TRANSITION = ".agents/skills/build-loop/scripts/transition.py"
+OLD_FOLDER = "." + "agents"
+TRANSITION = ".codeangel/skills/build-loop/scripts/transition.py"
 
 
 def run(root: Path, *args: str) -> int:
