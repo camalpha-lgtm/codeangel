@@ -1,6 +1,6 @@
 ---
 name: build-verify
-description: "Stage VERIFY of build-loop for a ticket — an independent verifier runs checks V1–V8 (lint, schema drift, full suite against baseline, planned tests, acceptance-criteria audit, scope, hygiene, docs in sync) and records PASS or FAIL in the ticket's spec without touching code. Run by the build-loop coordinator (in an isolated subagent where supported), or directly for a ticket whose spec is at VERIFY."
+description: "Stage VERIFY of build-loop for a ticket — an independent verifier runs checks V1–V9 (lint, schema drift, full suite against baseline, planned tests, acceptance-criteria audit, scope, hygiene, docs in sync, evidence from the running system) and records PASS or FAIL in the ticket's spec without touching code. Run by the build-loop coordinator (in an isolated subagent where supported), or directly for a ticket whose spec is at VERIFY."
 argument-hint: "<TICKET>"
 context: fork
 agent: build-verifier

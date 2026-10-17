@@ -1,0 +1,35 @@
+# AC-6: django-drf preset creates the recipe + helper and the generated gates pass
+
+$ uv run --project <codeangel> codeangel -C <scratch> add django-drf backend
+preset django-drf → backend/  (files created: 26, kept: 0)
+  rules added to doc-map.toml
+  row added to AGENTS.md
+  row added to docs/ai/repo-map.md
+  row added to README.md
+  row added to docs/learnings/README.md
+  row added to docs/ai/git-workflow.md
+  area added to .codeangel/codeangel.toml
+next: set up the env: `cd backend` → `poetry env use <python3.12 exe>` → `poetry install` → `poetry run python manage.py check` → `poetry run pytest -q`; interactive API docs at /api/docs/ once the server runs
+[exit 0]
+
+present  backend/docs/ai/evidence.md
+present  backend/core/seed_evidence.py
+present  backend/core/tests/test_seed_evidence.py
+router row: | gathering proof a change works: start, seed, auth, API transcript, screenshot | `backend/docs/ai/evidence.md` |
+
+$ poetry env use <python3.12>
+Using virtualenv: <poetry virtualenv>
+[exit 0]
+
+$ poetry install --quiet
+
+[exit 0]
+
+$ poetry run pytest -q
+.....                                                                    [100%]
+5 passed in 0.33s
+[exit 0]
+
+$ poetry run ruff check .
+All checks passed!
+[exit 0]

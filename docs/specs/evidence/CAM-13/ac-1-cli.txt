@@ -1,0 +1,12 @@
+# AC-1: planner cannot leave an AC without a proof plan
+
+$ .codeangel/skills/build-loop/scripts/transition.py go DEMO-1 planned
+REFUSED: PLAN → IMPLEMENT [planned] refused:
+  ✗ AC-2 has no [proof: api|ui|cli|none — reason] tag
+[exit 1]
+
+$ .codeangel/skills/build-loop/scripts/transition.py go DEMO-1 planned
+DEMO-1: PLAN → IMPLEMENT [planned] · attempt 0/5
+next: run skill build-implement (.codeangel/skills/build-implement/SKILL.md) — Planned tests first (seen failing for the right reason), then code; stay inside §Affected files.
+exits: implemented → VERIFY | blocked → BLOCKED | cancelled → CANCELLED
+[exit 0]

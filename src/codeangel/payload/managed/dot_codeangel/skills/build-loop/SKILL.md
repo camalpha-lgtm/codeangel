@@ -92,4 +92,4 @@ Runs once the ticket is DONE (also when resumed at DONE) and the PR is open and 
 4. Never blocks and writes nothing to the spec or to Git (the branch is merged or finished). A failed Linear update → one line to the user. Reply with one line: `merge watch <TICKET>: <merged → Done | closed | gh failing | timeout> — <PR url>`.
 
 ## Final report — ≤ 15 lines
-ticket · branch · PR URL + state (ready / draft + why) · AC met · verify attempts used · CI result · docs updated · learnings changed · follow-ups (out-of-scope items, baseline failures) · cleanup summary · merge watch (pending / skipped + why).
+ticket · branch · PR URL + state (ready / draft + why) · AC met · proof (n of m AC with captured evidence; what was not captured and why) · verify attempts used · CI result · docs updated · learnings changed · follow-ups (out-of-scope items, baseline failures) · cleanup summary · merge watch (pending / skipped + why).

@@ -54,7 +54,7 @@ entry = [
 produces = [
   "docs/specs/<TICKET>.md (created by `init`)",
   "§Ticket: verbatim ticket text",
-  "§Acceptance criteria: '- [ ] AC-n: …' lines, observable + testable",
+  "§Acceptance criteria: '- [ ] AC-n: …' lines, observable + testable, written as user behaviour, each tagged '[proof: api|ui|cli|none — reason]'",
   "§Out of scope: ≥ 1 bullet",
   "§Affected files: table path | create|modify | why",
   "§Test plan: table test-id (<file>::<name>, relative to its area) | AC ids | asserts",
@@ -68,14 +68,14 @@ produces = [
 status = "planned"
 mode = "plan"
 to = "AWAITING_APPROVAL"
-checks = ["plan_complete", "ac_test_mapping", "no_blocking_risks"]
+checks = ["plan_complete", "ac_test_mapping", "ac_proof_planned", "no_blocking_risks"]
 when = "Spec complete, mode=plan → commit spec, present the plan summary, end the turn."
 
 [[stages.PLAN.exits]]
 status = "planned"
 mode = "immediate"
 to = "IMPLEMENT"
-checks = ["plan_complete", "ac_test_mapping", "no_blocking_risks"]
+checks = ["plan_complete", "ac_test_mapping", "ac_proof_planned", "no_blocking_risks"]
 when = "Spec complete, mode=immediate → commit spec, continue without pausing."
 
 [stages.AWAITING_APPROVAL]
@@ -118,19 +118,20 @@ checks = ["planned_tests_exist"]
 when = "Every planned test exists and passes in a targeted run; changed files are lint-clean."
 
 [stages.VERIFY]
-does = "Run V1–V8 against §Baseline; record evidence."
+does = "Run V1–V9 against §Baseline; exercise each AC as a user would and record the proof in §Evidence."
 owner = "build-verify"
 entry = ["implementation in the working tree (uncommitted)", "run by an independent verifier (subagent where supported): edits only the spec, never code, never commits"]
 produces = [
-  "§Verify reports: '### Attempt <attempt+1> — PASS|FAIL' + one line per V1–V8; per FAIL ≤ 20-line excerpt, root cause, next action",
+  "§Verify reports: '### Attempt <attempt+1> — PASS|FAIL' + one line per V1–V9; per FAIL ≤ 20-line excerpt, root cause, next action",
   "on PASS: every AC ticked '- [x]', evidence 'AC-n: <test node id>; <file>:<line>' in the report",
+  "§Evidence: one row per AC (kind, artefact paths under <spec_dir>/evidence/<TICKET>/ or 'not captured: <reason>', note); the artefact files themselves",
 ]
 
 [[stages.VERIFY.exits]]
 status = "pass"
 to = "REVIEW"
-checks = ["latest_attempt_pass", "all_ac_ticked", "docs_synced"]
-when = "All V1–V8 pass. (The commit happens at REVIEW step 1.)"
+checks = ["latest_attempt_pass", "all_ac_ticked", "docs_synced", "evidence_recorded"]
+when = "All V1–V9 pass. (The commit happens at REVIEW step 1.)"
 
 [[stages.VERIFY.exits]]
 status = "fail"
@@ -232,6 +233,7 @@ produces = []
 [checks]
 plan_complete = "Each plan_sections section exists, has ≥ 1 non-template line, and keeps no template placeholder line."
 ac_test_mapping = "Every AC-n in §Acceptance criteria is covered by ≥ 1 §Test plan row; every row covers ≥ 1 known AC."
+ac_proof_planned = "Every AC line carries a '[proof: api|ui|cli|none — reason]' tag (kinds may combine with '+'); 'none' needs a reason."
 no_blocking_risks = "No '[blocking]' item in §Risks / open questions."
 planned_tests_exist = "Every §Test plan id resolves: <file> exists under an area path (or the repo root) and contains each named class / test."
 latest_attempt_pass = "Last '### Attempt N — …' in §Verify reports has N = attempt + 1 and says PASS."
@@ -241,6 +243,7 @@ pr_recorded = "Frontmatter pr is a URL."
 learnings_recorded = "§Learnings has ≥ 1 non-template line."
 note_required = "--note given."
 ci_flaky_once = "No ci_flaky since the last entry into REVIEW from another stage."
+evidence_recorded = "§Evidence has one row per AC; each row's kind is api, ui, cli or none; its proof is existing non-empty files under <spec_dir>/evidence/<TICKET>/, 'not captured: <reason>', or (kind none, planned none) 'n/a: <reason>'; a planned api/ui/cli AC is never kind none; no credential-looking value in the section or in a text artefact."
 docs_synced = "Every doc docs/ai/doc-map.toml maps from the files changed since base_sha has a §Docs impact row; updated rows really changed, unchanged rows give a reason; changed docs have clean whitespace; Claude shims in sync when skills changed."
 
 [effects]

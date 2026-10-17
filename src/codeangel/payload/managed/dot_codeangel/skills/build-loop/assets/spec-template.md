@@ -22,8 +22,8 @@ updated: <UTC ISO time>
 <verbatim ticket title, description, relevant comments>
 
 ## Acceptance criteria
-- [ ] AC-1: <method + path + input → status + body / DB effect, or concrete behaviour>
-- [ ] AC-2: <...> (implied)
+- [ ] AC-1: <what a user does and sees: screen / endpoint / command + input → observable result> [proof: api|ui|cli|none — reason]
+- [ ] AC-2: <...> (implied) [proof: api|ui|cli|none — reason]
 
 ## Out of scope
 - <tempting adjacent work explicitly not done here>
@@ -69,8 +69,15 @@ updated: <UTC ISO time>
 - V6 scope audit: PASS|FAIL
 - V7 hygiene: PASS|FAIL
 - V8 docs in sync: PASS|FAIL
+- V9 evidence: PASS|FAIL <rows captured / not captured>
 - Failure excerpt / root cause / next action: <...>
 -->
+
+## Evidence
+<!-- Written by VERIFY: one row per AC. kind = api | ui | cli | none. proof = comma-separated artefact paths under <spec_dir>/evidence/<TICKET>/, or `not captured: <reason>`, or `n/a: <reason>` (kind none only). -->
+| AC | kind | proof | note |
+|---|---|---|---|
+| AC-1 | <api, ui, cli or none> | <docs/specs/evidence/<TICKET>/ac-1-api.txt> | <what the proof shows> |
 
 ## Review
 - PR: <url>

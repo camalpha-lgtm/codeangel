@@ -1,0 +1,43 @@
+# AC-4: T proof renders the PR's Proof block (shown: the generated markdown)
+
+$ .codeangel/skills/build-loop/scripts/transition.py proof DEMO-1 --repo owner/repo --sha 0123456789abcdef --into pr-body.md
+DEMO-1: proof section written to pr-body.md
+[exit 0]
+
+$ cat pr-body.md
+## Summary
+Demo change
+
+<!-- proof:start -->
+
+## Proof
+
+2 of 2 acceptance criteria have captured proof. Gathered by the independent verifier against the running system (check V9); artefacts: `docs/specs/evidence/DEMO-1/`.
+
+### AC-1 — A user lists orders
+
+**api**
+_orders listed_
+
+`docs/specs/evidence/DEMO-1/ac-1-api.txt`
+```text
+GET /orders
+Cookie: sessionid=<redacted>
+HTTP/1.1 200 OK
+```
+
+### AC-2 — A user sees the list
+
+**ui**
+_the list page_
+
+![AC-2 ac-2-ui.png](https://github.com/owner/repo/blob/0123456789abcdef/docs/specs/evidence/DEMO-1/ac-2-ui.png?raw=true)
+
+<!-- proof:end -->
+
+$ .codeangel/skills/build-loop/scripts/transition.py proof DEMO-1 --repo owner/repo --sha fedcba9876543210 --into pr-body.md
+DEMO-1: proof section written to pr-body.md
+[exit 0]
+
+# second run replaced only the block: sha now
+![AC-2 ac-2-ui.png](https://github.com/owner/repo/blob/fedcba9876543210/docs/specs/evidence/DEMO-1/ac-2-ui.png?raw=true)

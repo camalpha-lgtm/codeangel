@@ -1,0 +1,13 @@
+# AC-8: this repo's installed harness is current, managed files stay project-agnostic
+
+$ codeangel update
+shims in sync
+codeangel 0.1.0: managed files up to date
+[exit 0]
+
+$ pytest tests/harness/test_payload.py -q
+..........                                                               [100%]
+10 passed in 1.09s
+
+$ sync-shims --check
+shims in sync

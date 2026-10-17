@@ -1,0 +1,12 @@
+# AC-2: verifier cannot pass without evidence for every AC
+
+$ .codeangel/skills/build-loop/scripts/transition.py go DEMO-1 pass
+REFUSED: VERIFY → REVIEW [pass] refused:
+  ✗ AC-2 has no row in §Evidence
+[exit 1]
+
+$ .codeangel/skills/build-loop/scripts/transition.py go DEMO-1 pass
+DEMO-1: VERIFY → REVIEW [pass] · attempt 0/5
+next: run skill build-review (.codeangel/skills/build-review/SKILL.md) — Push, open / update the draft PR, wait for CI, mark ready when green.
+exits: waiting_ci → REVIEW | ci_flaky → REVIEW | ci_green → LEARN | ci_red_baseline → LEARN | ci_red_code → IMPLEMENT | blocked → BLOCKED | cancelled → CANCELLED
+[exit 0]

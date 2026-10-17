@@ -5,7 +5,7 @@
 ## Layout (`{{area}}/`)
 ```
 {{package}}/       settings · urls (/admin/, /api/schema/, /api/docs/, app routes under /api/) · asgi · wsgi
-core/              models.BaseModel (abstract created_at / updated_at) · base_test.BaseTest
+core/              models.BaseModel (abstract created_at / updated_at) · base_test.BaseTest · seed_evidence (evidence session for build-loop proof)
 <app>/             one Django app per business domain (none yet)
 docs/ai/, docs/learnings/   agent docs
 ```

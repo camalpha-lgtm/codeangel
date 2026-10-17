@@ -3,7 +3,7 @@
 
 [[rule]]
 paths = ["{{area}}/package.json", "{{area}}/app.json", "{{area}}/app.config.*", "{{area}}/tsconfig.json", "{{area}}/eslint.config.*", "{{area}}/babel.config.*", "{{area}}/metro.config.*"]
-docs = ["{{area}}/docs/ai/stack.md", "{{area}}/AGENTS.md", "README.md"]
+docs = ["{{area}}/docs/ai/stack.md", "{{area}}/AGENTS.md", "README.md", "{{area}}/docs/ai/evidence.md"]
 why = "SDK + stack, scripts, gates, quick start"
 
 [[rule]]

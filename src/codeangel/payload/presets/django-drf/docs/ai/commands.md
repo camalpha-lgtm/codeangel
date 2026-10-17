@@ -18,6 +18,7 @@
 | schema drift | `poetry run python manage.py makemigrations --check --dry-run [<app>]` |
 | new migration | `poetry run python manage.py makemigrations <app> --name <snake_desc>` |
 | new app | `poetry run python manage.py startapp <name>` → add to `INSTALLED_APPS` → add `<app>/urls.py` → `path("api/<prefix>/", include("<app>.urls"))` in `{{area}}/{{package}}/urls.py` |
+| evidence session | `poetry run python -m core.seed_evidence` → JSON with a `sessionid` cookie for the `evidence` staff user (needs `DEBUG` on); recipe: `{{area}}/docs/ai/evidence.md` |
 | server | `poetry run python manage.py runserver` → Swagger UI `/api/docs/`, OpenAPI `/api/schema/` |
 | OpenAPI dump | `poetry run python manage.py spectacular` (YAML to stdout; add `--validate --fail-on-warn` to lint the schema) |
 | add dependency | `poetry add <pkg>` — never hand-edit `poetry.lock` |
