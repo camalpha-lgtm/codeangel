@@ -6,7 +6,7 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-8/install-default-cursor-and-claude-mcp-configs-into-child-projects
 branch: camerondhobbs/cam-8-install-default-cursor-and-claude-mcp-configs-into-child
 base_sha: c3b9736dcb3e3eedd1aacb078ca722b3480e9c5d
-pr:
+pr: https://github.com/camalpha-lgtm/codeangel/pull/4
 stage: REVIEW  # managed by transition.py — see stages.toml
 last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
@@ -167,7 +167,7 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 - V8 docs in sync: PASS `T docs CAM-8` docs_synced ready; README.md, AGENTS.md, docs/ai/repo-map.md, docs/ai/agent-docs.md, docs/ai/git-workflow.md and the scaffold copies and both doc maps read against the code: accurate; `unchanged` reasons (code-standards.md, learnings/tooling.md) hold.
 
 ## Review
-- PR: <url>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/4
 - CI runs: <!-- <run id> <sha> <conclusion> -->
 - Ready for review: <UTC time | not marked: reason>
 
