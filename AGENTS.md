@@ -7,11 +7,11 @@ codeangel is a Python CLI (stdlib only, Python ≥ 3.11) that installs an agent-
 ## Layout
 | path | what |
 |---|---|
-| `src/codeangel/cli.py` | the CLI: `init`, `add`, `update`, `sync`, `doctor`, `presets`, `version` |
+| `src/codeangel/` | packages `commands`, `doctor`, `install`, `io`, `project`; `cli.py` is `main` |
 | `src/codeangel/payload/managed/` | files installed into projects and kept current by `update` (skills, `sync-shims.py`, `build-verifier`, `docs/ai/agent-docs.md`) |
 | `src/codeangel/payload/scaffold/` | project-owned files created once at `init` (AGENTS.md, README, docs, config, CI) |
 | `src/codeangel/payload/presets/<name>/` | one area preset: `_preset.toml` (metadata), `_doc-map.toml` (rules appended to the project doc map), `_root/` (files for the repo root, e.g. CI), the rest installs inside the area dir |
-| `tests/test_cli.py` | end-to-end tests against throwaway projects |
+| `tests/` | `cli`, `install`, `io`, `project`, `harness`, `support` |
 
 ## Payload rules
 - A path part `dot_x` installs as `.x`; `{{name}}` (lowercase identifier) in a path or file is a template variable: `project_name`, `project_package`, `base_branch`, `python`, `python_toml`, `codeangel_version`, and for presets `area`, `area_name`, plus `[vars]`.
@@ -26,5 +26,11 @@ codeangel is a Python CLI (stdlib only, Python ≥ 3.11) that installs an agent-
 - Lint / format: `uv run ruff check src tests && uv run ruff format src tests` (the payload's `presets/` are excluded).
 - Try it: `uv run codeangel -C <dir> doctor`.
 
+## Code standards
+Object-oriented design for all code. No single-line comments, multi-line comments, or docstrings. Detail: `docs/ai/code-standards.md`.
+
+## Version
+`codeangel.__version__` is the version (`pyproject.toml` reads it). Release: bump that value, tag `vX.Y.Z`.
+
 ## Done
-Tests pass · ruff clean · a preset change was exercised in a generated project (`init` → `add` → the area's own gates) · README / this file updated if commands, layout, or payload rules changed.
+Tests pass · ruff clean · standards tests pass · a preset change was exercised in a generated project (`init` → `add` → the area's own gates) · README / this file updated if commands, layout, or payload rules changed.

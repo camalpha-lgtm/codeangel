@@ -4,6 +4,9 @@
 
 | path | what | guide |
 |---|---|---|
+| `src/codeangel/` | CLI package grouped into `commands`, `doctor`, `install`, `io`, and `project` | `AGENTS.md` |
+| `tests/` | `cli`, `install`, `io`, `project`, `harness`, and `support`; at most two test classes per file | `docs/ai/code-standards.md` |
+| `docs/ai/code-standards.md` | object-oriented design, no comments, size limits, gates | `AGENTS.md` |
 | `README.md` | human entry point: what it is, quick start, how to drive agents | `docs/ai/agent-docs.md` |
 | `docs/ai/` | cross-cutting agent reference; `doc-map.toml` = which docs describe which code | this dir |
 | `docs/learnings/` | cross-cutting learnings + index of every area's learnings | `docs/learnings/README.md` |

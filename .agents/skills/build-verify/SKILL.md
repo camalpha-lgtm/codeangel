@@ -28,7 +28,7 @@ CHANGED = `git diff --name-only <base_sha>` + `git ls-files --others --exclude-s
 | V4 | planned tests | run every Test plan id | all exist + pass |
 | V5 | AC audit | per AC read the implementation AND its test(s); the test must assert the AC's observable outcome (not just "200 / renders") | every AC has evidence `AC-n: <test id>; <file>:<line>` |
 | V6 | scope audit | `git status --porcelain` + `git diff --name-only <base_sha>` | changed ⊆ Affected files + spec; no Out-of-scope item done |
-| V7 | hygiene | read the full `git diff <base_sha>` | no debug output / breakpoints, commented-out code, bare TODOs, secrets, absolute or machine-specific paths, unrelated churn; area AGENTS.md "Always" rules + `docs/ai` conventions hold |
+| V7 | hygiene | read the full `git diff <base_sha>` | no debug output / breakpoints, commented-out code, bare TODOs, secrets, absolute or machine-specific paths, unrelated churn; area AGENTS.md "Always" rules + `docs/ai` conventions hold; the project's code standards (`docs/ai/code-standards.md`) hold |
 | V8 | docs in sync | `T docs <TICKET>`; then read every `updated` doc against the code (regenerate any generated table it names, e.g. a route list, and compare; run documented commands) and spot-check that `unchanged` reasons are true | `docs_synced` ✓ and every doc you read is accurate for the new code |
 
 ## Record + exit

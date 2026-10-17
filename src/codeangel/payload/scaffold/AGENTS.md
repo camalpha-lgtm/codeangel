@@ -24,6 +24,7 @@ root `AGENTS.md` → `AGENTS.md` of every area you touch → only the `docs/ai/`
 | recording a lesson; finding any area's learnings | `docs/learnings/README.md` |
 | which docs a change must update | `docs/ai/doc-map.toml` |
 | editing AGENTS.md, `docs/ai/`, learnings, skills, subagents | `docs/ai/agent-docs.md` |
+| code standards for this repo | `docs/ai/code-standards.md` |
 
 ## Always
 - Read code before changing it; match surrounding patterns; no drive-by refactors, renames, or fixes outside the task.
@@ -31,4 +32,5 @@ root `AGENTS.md` → `AGENTS.md` of every area you touch → only the `docs/ai/`
 - Never commit to `{{base_branch}}`, merge, force-push, or `--no-verify`. Commit / push / open PRs only when the user or build-loop asks.
 - No secrets in code (env only). Never call paid / external APIs or run data-mutating jobs unless the task requires it.
 - Docs move with code: a change that alters what `README.md`, any `AGENTS.md`, or `docs/ai/*` says updates that doc in the same change (`docs/ai/doc-map.toml`). Spot a stale doc → fix it.
+- Follow `docs/ai/code-standards.md`.
 - Done = the touched areas' `## Done` gates pass + docs in sync + non-obvious lessons filed per `docs/ai/agent-docs.md`.

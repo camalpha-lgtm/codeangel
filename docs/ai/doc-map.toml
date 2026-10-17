@@ -15,4 +15,9 @@ paths = [".github/workflows/*"]
 docs = ["docs/ai/git-workflow.md"]
 why = "CI workflow table"
 
+[[rule]]
+paths = ["src/codeangel*", "tests/*", "pyproject.toml"]
+docs = ["AGENTS.md", "README.md", "docs/ai/code-standards.md"]
+why = "CLI modules, tests, version, and code standards"
+
 # codeangel:areas — `codeangel add <preset> <path>` appends each area's rules below

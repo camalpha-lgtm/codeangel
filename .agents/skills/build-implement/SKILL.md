@@ -9,7 +9,7 @@ metadata:
 
 Read first: `.agents/skills/build-loop/references/contract.md`. Stage block: `T show IMPLEMENT`.
 Guard: `T status <TICKET>` = IMPLEMENT; else return per contract.
-Work list: spec `## Test plan` + `## Affected files`. Rules: the touched areas' `AGENTS.md` + `docs/ai` conventions.
+Work list: spec `## Test plan` + `## Affected files`. Rules: the touched areas' `AGENTS.md` + `docs/ai` conventions, including the project's code standards (`docs/ai/code-standards.md`).
 
 1. **Re-entry** (`last_status` = `fail` or `ci_red_code`): read the latest `### Attempt` in `## Verify reports` or the CI failure in `## Review` FIRST. Fix the root cause, not the symptom. Same check failed twice with the same signature → change approach (re-read code + learnings, revisit the design) instead of retrying the same fix.
 2. **Tests first**: write the planned tests → run them → confirm each fails for the EXPECTED reason (assertion / status, not import, fixture, or build errors).
