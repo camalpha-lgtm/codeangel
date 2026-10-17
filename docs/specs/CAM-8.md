@@ -8,7 +8,7 @@ branch: camerondhobbs/cam-8-install-default-cursor-and-claude-mcp-configs-into-c
 base_sha: c3b9736dcb3e3eedd1aacb078ca722b3480e9c5d
 pr: https://github.com/camalpha-lgtm/codeangel/pull/4
 stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: pass  # exit status that entered the current stage
+last_status: waiting_ci  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
@@ -179,3 +179,4 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 - 2026-10-17T15:56Z PLAN → IMPLEMENT [planned] attempt=0/5
 - 2026-10-17T15:58Z IMPLEMENT → VERIFY [implemented] attempt=0/5
 - 2026-10-17T16:00Z VERIFY → REVIEW [pass] attempt=0/5
+- 2026-10-17T16:00Z REVIEW → REVIEW [waiting_ci] attempt=0/5
