@@ -20,7 +20,8 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
 | `plan` + feedback | AWAITING_APPROVAL | `T go <TICKET> revise --note "<feedback>"` → dispatch (build-plan revises, ends at AWAITING_APPROVAL) |
 | any | PLAN…LEARN | STARTUP steps 1, 4–6 → dispatch |
 | any | BLOCKED | user resolved `blocked_reason`? → `T go <TICKET> unblocked --note "<resolution>"` → dispatch; else restate the blocker, stop |
-| any | DONE / CANCELLED | report status, stop |
+| any | DONE | report status; the PR is open and ready → MERGE WATCH; else stop |
+| any | CANCELLED | report status, stop |
 | user abandons the ticket | any | `T go <TICKET> cancelled --note "<why>"` |
 
 ## STARTUP — coordinator only, in order (spec may not exist yet)
@@ -46,6 +47,7 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
 <description verbatim>`. Comment not posted → do NOT overwrite; skip to the spec.
    3. **Write** — Linear MCP: `save_issue` (`id` = TICKET, `title`, `description`; change nothing else — not state, labels, assignee, priority). API: `issueUpdate` with `title` + `description` via the same GraphQL endpoint.
    4. Use the refined title as the ticket title from here on; hand build-plan the refined AC / out of scope as its starting draft, the Open questions as risks, and the ORIGINAL text as the verbatim ticket (§Ticket).
+3c. **Start the ticket** (new spec only; skip when the source is not Linear or the ticket's status is already started, Done or Canceled). Before the PLAN stage runs, set the Linear ticket to In Progress: Linear MCP `save_issue` (`id` = TICKET, `state` = `In Progress`; change nothing else); API: find the team's workflow state named In Progress, then `issueUpdate` with its `stateId`. Never blocks: any failure → log one line, continue.
 4. **Workspace alignment** — `git fetch --prune origin`; CUR = `git branch --show-current`; OWN = `git rev-list --count origin/<BASE>..HEAD`. Uncommitted changes not belonging to TICKET → stop. First matching case:
    | case | action |
    |---|---|
@@ -71,9 +73,23 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
    | LEARN | `build-learn` | inline |
    | AWAITING_APPROVAL | this skill | present the plan from the spec (AC, out of scope, affected files, test plan, docs impact, risks) → STOP, end turn |
    | BLOCKED | this skill | relay `blocked_reason` + what the user must do → STOP |
-   | DONE / CANCELLED | this skill | final report → STOP |
+   | DONE | this skill | final report → MERGE WATCH → STOP |
+   | CANCELLED | this skill | final report → STOP |
 3. Run a stage skill: invoke it as a skill with argument `<TICKET>` where your harness supports skills; otherwise read `.codeangel/skills/<owner>/SKILL.md` and follow it.
 4. It returned → its return line says where the ticket went. It ended the turn on purpose (REVIEW waiting on CI) → end the turn too. Else → step 1.
 
+## MERGE WATCH — after DONE, Linear tickets only
+Runs once the ticket is DONE (also when resumed at DONE) and the PR is open and ready: `gh pr view <pr> --json state,isDraft` → `OPEN` and not a draft. A draft PR (after `ci_red_baseline`) cannot be merged → skip and say so. PR already `MERGED` → treat as exit 0 below. Source not Linear → skip.
+1. Print the final report first.
+2. Run `<runtime.python> .codeangel/skills/build-loop/scripts/await_merge.py <pr>` as a background command with the longest timeout your harness allows (≥ 2 h). It polls `gh pr view` every 5 min for up to 2 h and makes no model call between polls: do not poll yourself, re-invoke a skill, or sleep-loop — end the turn and wait for the command to finish. A command killed by the harness timeout counts as exit 3.
+3. On exit, one action:
+   | exit | meaning | Linear status |
+   |---|---|---|
+   | 0 | merged | Done: status not already Done → `save_issue` (`id` = TICKET, `state` = `Done`; API: `issueUpdate` with the team's Done `stateId`) |
+   | 1 | closed without merging | unchanged; tell the user |
+   | 2 | `gh` failed 3 polls in a row | unchanged; tell the user the error |
+   | 3 | still open after 2 h | unchanged; tell the user |
+4. Never blocks and writes nothing to the spec or to Git (the branch is merged or finished). A failed Linear update → one line to the user. Reply with one line: `merge watch <TICKET>: <merged → Done | closed | gh failing | timeout> — <PR url>`.
+
 ## Final report — ≤ 15 lines
-ticket · branch · PR URL + state (ready / draft + why) · AC met · verify attempts used · CI result · docs updated · learnings changed · follow-ups (out-of-scope items, baseline failures) · cleanup summary.
+ticket · branch · PR URL + state (ready / draft + why) · AC met · verify attempts used · CI result · docs updated · learnings changed · follow-ups (out-of-scope items, baseline failures) · cleanup summary · merge watch (pending / skipped + why).

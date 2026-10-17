@@ -29,6 +29,11 @@ Each area's `AGENTS.md` → `## Done` lists its gates (lint / format on changed 
 ## Docs move with code
 The PR that changes behaviour, structure, commands, deps, or setup also updates every doc that describes it — `README.md`, any `AGENTS.md`, `docs/ai/*`, learnings. `project.doc_map` (default `docs/ai/doc-map.toml`) says which docs describe which paths; `T docs` applies it; VERIFY refuses to pass until each mapped doc is updated or marked unchanged with a reason. A doc you notice is wrong (even unmapped) → fix it in the same change and list it in `## Docs impact`.
 
+## Tracker status
+Linear tickets only; best-effort, never blocks (a failure is one log line). The coordinator makes both moves, not the stage skills:
+- STARTUP sets the ticket to In Progress before PLAN, unless it is already started, Done or Canceled.
+- After DONE, with the PR open and ready, `scripts/await_merge.py <pr>` waits for the merge (polls `gh pr view` every 5 min, up to 2 h, no model calls); exit 0 merged → set Done, 1 closed, 2 `gh` failing, 3 timeout → status unchanged, tell the user.
+
 ## Never
 Weaken, delete, skip, or disable a test to pass VERIFY · edit AC to fit the code (use `## Plan amendments`) · add lint ignores to silence findings you caused · `--no-verify` · force-push · commit to the base branch · merge the PR · call paid / external APIs or run data-mutating jobs unless the ticket requires it.
 

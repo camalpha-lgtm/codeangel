@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-7/automatically-update-linear-t
 branch: camerondhobbs/cam-7-automatically-update-linear-ticket-on-build-loop-progress
 base_sha: 7288c1846d631fc421e9fd741b46238b3d593852
 pr:
-stage: IMPLEMENT  # managed by transition.py — see stages.toml
-last_status: planned  # exit status that entered the current stage
+stage: REVIEW  # managed by transition.py — see stages.toml
+last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T15:27Z
-updated: 2026-10-17T15:28Z
+updated: 2026-10-17T15:33Z
 ---
 
 # CAM-7: Automatically update Linear ticket on build-loop progress
@@ -28,12 +28,12 @@ Comments: none.
 Refined by build-loop STARTUP (Linear description rewritten with Summary / Context / Acceptance criteria / Out of scope / Open questions; the original is kept as a Linear comment). Title kept apart from the capitalised "Linear".
 
 ## Acceptance criteria
-- [ ] AC-1: When build-loop starts a new ticket whose tracker is Linear and whose status is not already started, completed or canceled, STARTUP sets the Linear ticket to In Progress (`save_issue` `state`, or the API fallback) before the PLAN stage runs; a failure is logged and never blocks.
-- [ ] AC-2: After the ticket reaches DONE with a ready (non-draft) PR, the build-loop coordinator runs `.codeangel/skills/build-loop/scripts/await_merge.py <pr>` once; the script polls `gh pr view <pr> --json state` every 300 s by default and makes no model call between polls (the skill is not re-invoked).
-- [ ] AC-3: When the script sees the PR `MERGED` it exits 0 immediately, and the coordinator then sets the Linear ticket to Done (`save_issue` `state`, or the API fallback).
-- [ ] AC-4: When the PR is still open after the timeout (7200 s by default) the script exits 3 and the coordinator leaves the Linear status unchanged and says so in the final report.
-- [ ] AC-5: When the PR is `CLOSED` without merging the script exits 1 and the coordinator leaves the Linear status unchanged and says so in the final report. (implied)
-- [ ] AC-6: When `gh` fails 3 polls in a row the script exits 2 with the error instead of polling on, and the coordinator leaves the Linear status unchanged. (implied)
+- [x] AC-1: When build-loop starts a new ticket whose tracker is Linear and whose status is not already started, completed or canceled, STARTUP sets the Linear ticket to In Progress (`save_issue` `state`, or the API fallback) before the PLAN stage runs; a failure is logged and never blocks.
+- [x] AC-2: After the ticket reaches DONE with a ready (non-draft) PR, the build-loop coordinator runs `.codeangel/skills/build-loop/scripts/await_merge.py <pr>` once; the script polls `gh pr view <pr> --json state` every 300 s by default and makes no model call between polls (the skill is not re-invoked).
+- [x] AC-3: When the script sees the PR `MERGED` it exits 0 immediately, and the coordinator then sets the Linear ticket to Done (`save_issue` `state`, or the API fallback).
+- [x] AC-4: When the PR is still open after the timeout (7200 s by default) the script exits 3 and the coordinator leaves the Linear status unchanged and says so in the final report.
+- [x] AC-5: When the PR is `CLOSED` without merging the script exits 1 and the coordinator leaves the Linear status unchanged and says so in the final report. (implied)
+- [x] AC-6: When `gh` fails 3 polls in a row the script exits 2 with the error instead of polling on, and the coordinator leaves the Linear status unchanged. (implied)
 
 ## Out of scope
 - Other Linear transitions (In Review, Canceled, Blocked) and Linear comments about progress; only In Progress at planning start and Done on merge.
@@ -117,6 +117,23 @@ Refined by build-loop STARTUP (Linear description rewritten with Summary / Conte
 - Failure excerpt / root cause / next action: <...>
 -->
 
+### Attempt 1 — PASS
+- V1 lint/format: PASS `uv run ruff check src tests` exit 0; `ruff format --check src tests` exit 0 (68 files); sync-shims --check in sync; no file modified
+- V2 schema drift: PASS (skipped: this repo has no schema or migrations)
+- V3 full suite: PASS 74 passed, 0 failed (baseline 64 passed, 0 failed); no collection errors
+- V4 planned tests: PASS all 10 ids in tests/cli/test_merge_watch.py exist and pass
+- V5 AC audit: PASS
+  - AC-1: tests/cli/test_merge_watch.py::TestBuildLoopInstructions::test_startup_sets_in_progress_before_planning; tests/cli/test_merge_watch.py:121 (SKILL.md step 3c, skip when started / Done / Canceled, never blocks, before Dispatch)
+  - AC-2: tests/cli/test_merge_watch.py::TestMergeWatcher::test_asks_github_cli_for_the_pr_state, ::test_defaults_poll_every_five_minutes_for_two_hours, ::test_script_is_installed_into_projects, TestBuildLoopInstructions::test_merge_watch_runs_the_script_and_never_recalls_the_skill; tests/cli/test_merge_watch.py:69, :61, :107, :129
+  - AC-3: tests/cli/test_merge_watch.py::TestMergeWatcher::test_exits_zero_as_soon_as_the_pr_is_merged; tests/cli/test_merge_watch.py:78 (plus SKILL.md exit 0 row sets Done, test_merge_outcomes_map_to_linear_status:138)
+  - AC-4: tests/cli/test_merge_watch.py::TestMergeWatcher::test_exits_three_when_still_open_at_the_timeout; tests/cli/test_merge_watch.py:85
+  - AC-5: tests/cli/test_merge_watch.py::TestMergeWatcher::test_exits_one_when_the_pr_is_closed_unmerged; tests/cli/test_merge_watch.py:92
+  - AC-6: tests/cli/test_merge_watch.py::TestMergeWatcher::test_exits_two_after_three_consecutive_gh_failures; tests/cli/test_merge_watch.py:99
+  - Also ran the installed script against a nonexistent PR (real gh): exit 2 after 3 failed polls with the gh error; `--interval 0` exits 2 with a usage message.
+- V6 scope audit: PASS changed files all in Affected files; .codeangel/codeangel.toml shows as modified in `git status` but has no content diff (line-ending stat only); no out-of-scope item done (stages.toml / transition.py untouched)
+- V7 hygiene: PASS no debug output, commented-out code, TODOs, secrets or machine paths; payload script is class-based with a module usage docstring like transition.py (payload is excluded from the standards)
+- V8 docs in sync: PASS `T docs CAM-7` docs_synced ready; README.md and docs/ai/agent-docs.md match the new skill/script behaviour; installed copies equal the payload sources (ignoring CR); doctor 0 problems
+
 ## Review
 - PR: <url>
 - CI runs: <!-- <run id> <sha> <conclusion> -->
@@ -128,3 +145,5 @@ Refined by build-loop STARTUP (Linear description rewritten with Summary / Conte
 ## Log
 - 2026-10-17T15:27Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-7-automatically-update-linear-ticket-on-build-loop-progress, base=7288c1846d
 - 2026-10-17T15:28Z PLAN → IMPLEMENT [planned] attempt=0/5
+- 2026-10-17T15:31Z IMPLEMENT → VERIFY [implemented] attempt=0/5
+- 2026-10-17T15:33Z VERIFY → REVIEW [pass] attempt=0/5
