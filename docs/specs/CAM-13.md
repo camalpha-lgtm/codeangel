@@ -6,14 +6,14 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-13/show-proof-of-working-changes-in-the-pr-description
 branch: camerondhobbs/cam-13-show-proof-in-pr-description
 base_sha: 2ef7d3d4f7d6e1b28fb554607711a015a63a5c61
-pr:
-stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: pass  # exit status that entered the current stage
+pr: https://github.com/camalpha-lgtm/codeangel/pull/5
+stage: DONE  # managed by transition.py — see stages.toml
+last_status: learned  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T20:17Z
-updated: 2026-10-17T20:22Z
+updated: 2026-10-17T20:23Z
 ---
 
 # CAM-13: Show proof of working changes in the PR description
@@ -169,15 +169,18 @@ Run: `uv run pytest`. AC-6's generated-project gates (tests + ruff of the genera
 | AC-8 | cli | docs/specs/evidence/CAM-13/ac-8-cli.txt | `update` reports up to date, payload tests and shim check pass |
 
 ## Review
-- PR: <url>
-- CI runs: <!-- <run id> <sha> <conclusion> -->
-- Ready for review: <UTC time | not marked: reason>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/5
+- CI runs: 39066449141 e29109980178200c49c3ca55650ef4b64fc024d6 success
+- Ready for review: marked ready after CI green (2026-10-17)
 
 ## Learnings
-<!-- - <area>/docs/learnings/<file>.md or <area>/docs/ai/<file>.md: <entry added/updated/deleted> | none: <why> -->
+- docs/learnings/tooling.md: added two entries (ruff format touches managed payload scripts → rerun update; test preset Python in a generated project, session-hash finding)
+- doc map: no change — every doc that went stale was already mapped
 
 ## Log
 - 2026-10-17T20:17Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-13-show-proof-in-pr-description, base=2ef7d3d4f7
 - 2026-10-17T20:21Z PLAN → IMPLEMENT [planned] attempt=0/5
 - 2026-10-17T20:21Z IMPLEMENT → VERIFY [implemented] attempt=0/5
 - 2026-10-17T20:22Z VERIFY → REVIEW [pass] attempt=0/5
+- 2026-10-17T20:23Z REVIEW → LEARN [ci_green] attempt=0/5
+- 2026-10-17T20:23Z LEARN → DONE [learned] attempt=0/5
