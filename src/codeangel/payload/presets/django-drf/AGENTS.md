@@ -11,6 +11,7 @@ Python 3.12 · Django · Django REST Framework · drf-spectacular (OpenAPI) · p
 | where code goes, request path, live routes, exemplar files | `{{area}}/docs/ai/architecture.md` |
 | writing views, serializers, services, models, admin, migrations; style | `{{area}}/docs/ai/conventions.md` |
 | writing / fixing tests | `{{area}}/docs/ai/testing.md` |
+| gathering proof a change works: start, seed, auth, API transcript, screenshot | `{{area}}/docs/ai/evidence.md` |
 | DRF behaviour: status codes, auth, errors, pagination | `{{area}}/docs/learnings/api.md` |
 | touching `{{area}}/<app>/` | `{{area}}/docs/learnings/domain/<app>.md` (if it exists) |
 | poetry, prek, ruff, env trouble | `{{area}}/docs/learnings/tooling.md` |

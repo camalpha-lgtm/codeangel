@@ -13,6 +13,7 @@
   | `T go <TICKET> <status> [--note "…"]` | the ONLY way to change stage; REFUSED (exit 1) if illegal or checks fail → fix what it lists |
   | `T log <TICKET> "<event>"` | record an event without a stage change |
   | `T docs <TICKET>` | docs the change must update (doc map) vs `## Docs impact` — the V8 gate |
+  | `T proof <TICKET> --repo OWNER/REPO --sha SHA [--into FILE]` | render `## Evidence` as the PR's `## Proof` block (REVIEW) |
   | `T show [STAGE]` | print the map |
   | `T init <TICKET> …` | create the spec (build-plan only) |
 - Never hand-edit frontmatter `stage` / `last_status` / `attempt` / `mode` / `blocked_*` / `updated`; never write `## Log`.
@@ -35,13 +36,19 @@ The PR that changes behaviour, structure, commands, deps, or setup also updates 
 - `gh` is the fallback when the GitHub MCP is unavailable, and the only tool for waits that need no judgement: `gh pr checks --watch` and `scripts/await_merge.py` make no model call per poll, where an MCP call per poll would.
 - `codeangel init` installs both servers in `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor); the user signs in to each in the host.
 
+## Evidence
+Proof that a change works, gathered at VERIFY (V9) and shown in the PR. PLAN writes each AC as user behaviour and tags it `[proof: api|ui|cli|none — reason]`. VERIFY exercises the running system once per AC and records `## Evidence` (`| AC | kind | proof | note |`), artefacts in `<project.spec_dir>/evidence/<TICKET>/` (`ac-<n>-<kind>.txt|png`). REVIEW commits them and renders `## Proof` into the PR body with `T proof`.
+- Each area's `docs/ai/evidence.md` holds the recipe: start · seed · auth · capture. Throwaway data only; auth is generated for the run, never a real account, never committed.
+- Credentials, session ids, tokens, and cookies appear as `<redacted>` (the `evidence_recorded` check scans the section and text artefacts for credential-looking values).
+- `not captured: <reason>` is the honest answer when the environment cannot show it; faked, edited, or reused proof is a violation.
+
 ## Tracker status
 Linear tickets only; best-effort, never blocks (a failure is one log line). The coordinator makes both moves, not the stage skills:
 - STARTUP sets the ticket to In Progress before PLAN, unless it is already started, Done or Canceled.
 - After DONE, with the PR open and ready, `scripts/await_merge.py <pr>` waits for the merge (polls `gh pr view` every 5 min, up to 2 h, no model calls); exit 0 merged → set Done, 1 closed, 2 `gh` failing, 3 timeout → status unchanged, tell the user.
 
 ## Never
-Weaken, delete, skip, or disable a test to pass VERIFY · edit AC to fit the code (use `## Plan amendments`) · add lint ignores to silence findings you caused · `--no-verify` · force-push · commit to the base branch · merge the PR · call paid / external APIs or run data-mutating jobs unless the ticket requires it.
+Weaken, delete, skip, or disable a test to pass VERIFY · edit AC to fit the code (use `## Plan amendments`) · add lint ignores to silence findings you caused · `--no-verify` · fake, hand-edit, or reuse evidence · force-push · commit to the base branch · merge the PR · call paid / external APIs or run data-mutating jobs unless the ticket requires it.
 
 ## Stop
 Blocking question · needed change out of scope · CI wait > 30 min · required tool missing and not installable · workspace can't be aligned safely → `T go <TICKET> blocked --note "<blocker + exactly what the user must do>"` and return. Can't reach the user (e.g. running as a subagent) → same.

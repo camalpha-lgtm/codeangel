@@ -1,0 +1,13 @@
+# AC-3: evidence cannot leak credentials
+
+$ .codeangel/skills/build-loop/scripts/transition.py go DEMO-1 pass
+REFUSED: VERIFY → REVIEW [pass] refused:
+  ✗ docs/specs/evidence/DEMO-1/ac-1-api.txt: credential-looking value for 'sessionid' → replace it with <redacted>
+[exit 1]
+
+# after redacting the cookie in the artefact
+$ .codeangel/skills/build-loop/scripts/transition.py go DEMO-1 pass
+DEMO-1: VERIFY → REVIEW [pass] · attempt 0/5
+next: run skill build-review (.codeangel/skills/build-review/SKILL.md) — Push, open / update the draft PR, wait for CI, mark ready when green.
+exits: waiting_ci → REVIEW | ci_flaky → REVIEW | ci_green → LEARN | ci_red_baseline → LEARN | ci_red_code → IMPLEMENT | blocked → BLOCKED | cancelled → CANCELLED
+[exit 0]

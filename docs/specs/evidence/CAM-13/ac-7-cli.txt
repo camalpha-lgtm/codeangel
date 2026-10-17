@@ -1,0 +1,16 @@
+# AC-7: expo preset creates a recipe that states its web-target prerequisite
+
+$ uv run --project <codeangel> codeangel -C <scratch> add expo frontend
+preset expo → frontend/  (files created: 6, kept: 0)
+  rules added to doc-map.toml
+  row added to AGENTS.md
+  row added to docs/ai/repo-map.md
+  row added to README.md
+  row added to docs/learnings/README.md
+  row added to docs/ai/git-workflow.md
+  area added to .codeangel/codeangel.toml
+next: `cd frontend` → if `eslint.config.js` is missing run `npx expo lint` twice (the first run installs ESLint and exits 1) and commit the result → `npx expo start`; read the Expo docs for your SDK before writing Expo code
+[exit 0]
+
+frontend/docs/ai/evidence.md → A native-only Expo app cannot be screenshotted headlessly. The web target needs `react-native-web` and `react-dom` (`npx expo install react-native-web react-dom
+router row: | gathering proof a change works: web target, screenshot | `frontend/docs/ai/evidence.md` |

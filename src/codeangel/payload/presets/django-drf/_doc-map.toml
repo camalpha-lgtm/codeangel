@@ -28,7 +28,7 @@ why = "lint hook list, test invocation"
 
 [[rule]]
 paths = ["{{area}}/core/*"]
-docs = ["{{area}}/docs/ai/architecture.md", "{{area}}/docs/ai/testing.md"]
+docs = ["{{area}}/docs/ai/architecture.md", "{{area}}/docs/ai/testing.md", "{{area}}/docs/ai/evidence.md"]
 why = "core/ layout: BaseModel, BaseTest, shared utilities"
 
 [[rule]]
@@ -40,3 +40,8 @@ why = "shared test fixtures"
 paths = ["{{area}}/*/management/commands/*"]
 docs = ["{{area}}/docs/ai/commands.md"]
 why = "management-command table"
+
+[[rule]]
+paths = ["{{area}}/{{package}}/settings.py", "{{area}}/{{package}}/urls.py", "{{area}}/*/permissions.py"]
+docs = ["{{area}}/docs/ai/evidence.md"]
+why = "how the verifier starts the server and authenticates (session cookie today)"

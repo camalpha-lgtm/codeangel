@@ -13,6 +13,7 @@ Before writing Expo / EAS / React Native code: read the major version of `expo` 
 | stack, scripts, layout, navigation, how the app talks to the API | `{{area}}/docs/ai/stack.md` |
 | writing / changing Expo code, adding packages, routing, EAS builds | `{{area}}/docs/ai/expo-official.md` (Expo's own agent guidance) |
 | the app needs a new / changed endpoint | the API area's `AGENTS.md` first (API before client) |
+| gathering proof a change works: web target, screenshot | `{{area}}/docs/ai/evidence.md` |
 | {{area_name}} gotchas | `{{area}}/docs/learnings/README.md` |
 
 ## Always
