@@ -8,7 +8,7 @@ codeangel is a Python CLI (stdlib only, Python ≥ 3.11) that installs an agent-
 | path | what |
 |---|---|
 | `src/codeangel/` | packages `commands`, `doctor`, `install`, `io`, `project`; `cli.py` is `main` |
-| `src/codeangel/payload/managed/` | files installed into projects and kept current by `update` (skills, `sync-shims.py`, `build-verifier`, `docs/ai/agent-docs.md`) |
+| `src/codeangel/payload/managed/` | files installed into projects and kept current by `update` (skills, `sync-shims.py`, `build-verifier`, `docs/ai/agent-docs.md`, the MCP configs `.mcp.json` and `.cursor/mcp.json`) |
 | `src/codeangel/payload/scaffold/` | project-owned files created once at `init` (AGENTS.md, README, docs, config, CI) |
 | `src/codeangel/payload/presets/<name>/` | one area preset: `_preset.toml` (metadata), `_doc-map.toml` (rules appended to the project doc map), `_root/` (files for the repo root, e.g. CI), the rest installs inside the area dir |
 | `tests/` | `cli`, `install`, `io`, `project`, `harness`, `support` |

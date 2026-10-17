@@ -36,7 +36,10 @@ class TestPayload:
             assert (folder / name).exists()
         assert not (ROOT / OLD_FOLDER).exists()
         keys = json.loads((folder / "codeangel.lock.json").read_text(encoding="utf-8"))["files"]
-        assert all(key.startswith((".codeangel/", ".claude/", "docs/")) for key in keys)
+        assert all(
+            key.startswith((".codeangel/", ".claude/", ".cursor/", ".mcp.json", "docs/"))
+            for key in keys
+        )
 
     def test_no_file_references_the_old_agents_folder(self):
         pattern = re.compile(r"(?<![\w])" + re.escape(OLD_FOLDER) + r"\b|dot_" + "agents")

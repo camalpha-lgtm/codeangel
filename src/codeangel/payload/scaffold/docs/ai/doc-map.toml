@@ -6,7 +6,7 @@
 # A doc went stale and no rule caught it → add or widen a rule here (build-learn does this).
 
 [[rule]]
-paths = [".codeangel/*", ".claude/agents/*"]
+paths = [".codeangel/*", ".claude/agents/*", ".mcp.json", ".cursor/*"]
 docs = ["docs/ai/repo-map.md", "README.md"]
 why = "skills / subagents / project config layout; how humans drive agents"
 

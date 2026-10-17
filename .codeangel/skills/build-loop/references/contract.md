@@ -29,6 +29,12 @@ Each area's `AGENTS.md` → `## Done` lists its gates (lint / format on changed 
 ## Docs move with code
 The PR that changes behaviour, structure, commands, deps, or setup also updates every doc that describes it — `README.md`, any `AGENTS.md`, `docs/ai/*`, learnings. `project.doc_map` (default `docs/ai/doc-map.toml`) says which docs describe which paths; `T docs` applies it; VERIFY refuses to pass until each mapped doc is updated or marked unchanged with a reason. A doc you notice is wrong (even unmapped) → fix it in the same change and list it in `## Docs impact`.
 
+## Tools
+- Tracker (Linear): the Linear MCP (tool names contain `linear`: `get_issue`, `list_comments`, `save_comment`, `save_issue`). Never an API client: no API key, no raw HTTP calls. No Linear MCP → ask the user to paste the ticket.
+- Pull requests (GitHub): the GitHub MCP (tool names contain `github`) for finding, creating and updating a PR, reading its state and checks, marking it ready, rerunning failed jobs, reading failure logs, and listing merged PRs. Name the operation, not an exact tool: tool names differ between server versions.
+- `gh` is the fallback when the GitHub MCP is unavailable, and the only tool for waits that need no judgement: `gh pr checks --watch` and `scripts/await_merge.py` make no model call per poll, where an MCP call per poll would.
+- `codeangel init` installs both servers in `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor); the user signs in to each in the host.
+
 ## Tracker status
 Linear tickets only; best-effort, never blocks (a failure is one log line). The coordinator makes both moves, not the stage skills:
 - STARTUP sets the ticket to In Progress before PLAN, unless it is already started, Done or Canceled.

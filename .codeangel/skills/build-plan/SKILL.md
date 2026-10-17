@@ -11,7 +11,7 @@ Read first: `.codeangel/skills/build-loop/references/contract.md`. Stage block: 
 Guard: new ticket (no spec) or `T status <TICKET>` = PLAN; else return per contract.
 From the coordinator (new ticket): MODE, verbatim original ticket text, title, TARGET branch, url, source, STARTUP risks, and — when the coordinator refined the ticket — a draft of AC, out of scope and open questions.
 
-1. **Init** (new spec only): `T init <TICKET> --mode <MODE> --title "<title>" --branch <TARGET> --base-sha $(git merge-base HEAD origin/<BASE>) --url <url> --source <linear-mcp|linear-api|user-paste>`. Paste the original ticket verbatim under `## Ticket`.
+1. **Init** (new spec only): `T init <TICKET> --mode <MODE> --title "<title>" --branch <TARGET> --base-sha $(git merge-base HEAD origin/<BASE>) --url <url> --source <linear-mcp|user-paste>`. Paste the original ticket verbatim under `## Ticket`.
 2. **Research**: root `AGENTS.md` → each touched area's `AGENTS.md` → its `docs/ai` + `docs/learnings` files; read every file you'll change plus its tests.
 3. **Baseline** on the untouched branch → `## Baseline`: run each touched area's `## Done` gates (commands in its `docs/ai/commands.md`) — record exit codes, test counts, failing test ids, collection / build errors, lint debt (read-only linters only: fixers would modify the tree), schema drift.
    Unusable baseline → `[blocking]` risk unless this ticket's scope fixes it: the test suite can't run · schema drift in an area whose models this ticket changes.

@@ -85,3 +85,25 @@ class TestUpdate:
         assert run(project, "update") == 0
 
         assert agents.read_text(encoding="utf-8") == "customised\n"
+
+    def test_update_recreates_a_missing_mcp_config(self, project: Path):
+        config = project / ".mcp.json"
+        shipped = (PAYLOAD.managed.base / "dot_mcp.json").read_text(encoding="utf-8")
+        config.unlink()
+
+        assert run(project, "update") == 0
+
+        assert config.read_text(encoding="utf-8") == shipped
+
+    def test_update_keeps_an_edited_mcp_config(self, project: Path, newer_payload: Path):
+        config = project / ".cursor/mcp.json"
+        config.write_text(config.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        edited = config.read_text(encoding="utf-8")
+        shipped = newer_payload / "dot_cursor/mcp.json"
+        shipped.write_text(shipped.read_text(encoding="utf-8") + "\n\n", encoding="utf-8")
+
+        assert run(project, "update") == 0
+
+        assert config.read_text(encoding="utf-8") == edited
+        proposal = config.with_name("mcp.json" + ManagedInstaller.NEW_SUFFIX)
+        assert proposal.read_text(encoding="utf-8") == shipped.read_text(encoding="utf-8")
