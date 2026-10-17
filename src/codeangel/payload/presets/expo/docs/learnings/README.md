@@ -4,4 +4,5 @@
 
 | file | read when |
 |---|---|
-<!-- add a row per file: tooling.md, navigation.md, … -->
+| `{{area}}/docs/learnings/tooling.md` | expo lint / export / doctor, template quirks |
+<!-- add a row per file: navigation.md, … -->

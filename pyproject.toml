@@ -11,7 +11,7 @@ requires-python = ">=3.11"
 authors = [{ name = "Cameron Hobbs" }]
 dependencies = []
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]

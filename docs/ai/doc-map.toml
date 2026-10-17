@@ -1,0 +1,18 @@
+# doc map — which docs describe which code. AUTHORITATIVE for "docs move with code".
+# A change touching a rule's `paths` must, in the SAME change, either update each doc in `docs` or record it as
+# `unchanged` with a reason in the spec's `## Docs impact`. build-loop enforces this at VERIFY (transition.py
+# check `docs_synced`; preview with `T docs <TICKET>`). Without build-loop, apply it by hand.
+# Globs: fnmatch on repo-relative posix paths — `*` also matches `/`.
+# A doc went stale and no rule caught it → add or widen a rule here (build-learn does this).
+
+[[rule]]
+paths = [".agents/*", ".claude/agents/*"]
+docs = ["docs/ai/repo-map.md", "README.md"]
+why = "skills / subagents / project config layout; how humans drive agents"
+
+[[rule]]
+paths = [".github/workflows/*"]
+docs = ["docs/ai/git-workflow.md"]
+why = "CI workflow table"
+
+# codeangel:areas — `codeangel add <preset> <path>` appends each area's rules below

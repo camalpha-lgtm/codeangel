@@ -21,9 +21,10 @@ codeangel is a Python CLI (stdlib only, Python ≥ 3.11) that installs an agent-
 - Presets name only their own stack. Verify every preset's commands by running them in a generated project before shipping.
 
 ## Commands
-- Tests: `pytest` (stdlib + pytest only; tests set up projects under `tmp_path`).
-- Lint / format: `ruff check src tests && ruff format src tests` (the payload's `presets/` are excluded).
-- Try it: `python -m codeangel -C <dir> doctor` (with `src/` on `PYTHONPATH`, or after `pip install -e .`).
+- Setup: `uv sync` (creates `.venv`, installs the `dev` group). Run everything through `uv run`.
+- Tests: `uv run pytest` (stdlib + pytest only; tests set up projects under `tmp_path`).
+- Lint / format: `uv run ruff check src tests && uv run ruff format src tests` (the payload's `presets/` are excluded).
+- Try it: `uv run codeangel -C <dir> doctor`.
 
 ## Done
 Tests pass · ruff clean · a preset change was exercised in a generated project (`init` → `add` → the area's own gates) · README / this file updated if commands, layout, or payload rules changed.

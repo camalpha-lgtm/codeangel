@@ -163,6 +163,28 @@ class TestAdd:
         assert (project / "frontend/AGENTS.md").is_file()
         assert (project / ".github/workflows/frontend.yml").is_file()
 
+    def test_expo_adopts_the_generators_agents_md(self, project: Path):
+        (project / "frontend").mkdir()
+        (project / "frontend/package.json").write_text("{}\n", encoding="utf-8")
+        vendor = "This is an Expo app.\n\n## Expo has changed\n\nRead the docs.\n"
+        (project / "frontend/AGENTS.md").write_text(vendor, encoding="utf-8")
+
+        assert run(project, "add", "expo", "frontend") == 0
+
+        adopted = (project / "frontend/docs/ai/expo-official.md").read_text(encoding="utf-8")
+        assert adopted.startswith("# Expo official agent guidance")
+        assert "<!-- When:" in adopted
+        assert vendor.strip() in adopted
+        router = (project / "frontend/AGENTS.md").read_text(encoding="utf-8")
+        assert "Loaded for any work under" in router
+        assert "frontend/docs/ai/expo-official.md" in router
+        # Re-running neither re-adopts the router nor changes anything.
+        assert run(project, "add", "expo", "frontend") == 0
+        assert (project / "frontend/docs/ai/expo-official.md").read_text(
+            encoding="utf-8"
+        ) == adopted
+        assert run(project, "doctor") == 0
+
     def test_requires_an_initialised_project(self, tmp_path: Path):
         assert run(tmp_path, "add", "django-drf", "backend") == 2
 

@@ -36,6 +36,7 @@ SYNC = ".agents/sync-shims.py"
 TRANSITION = ".agents/skills/build-loop/scripts/transition.py"
 ROW_MARKER = "<!-- codeangel:areas"
 CI_MARKER = "<!-- codeangel:ci"
+ADOPT_GUARD = "Loaded for any work under"  # present in every preset-written area AGENTS.md
 DOC_MAP_MARKER = "# codeangel:areas"
 NEW_SUFFIX = ".codeangel-new"
 VAR_RE = re.compile(r"\{\{([a-z_]+)\}\}")
@@ -265,6 +266,25 @@ def cmd_add(args: argparse.Namespace) -> int:
     ]
     if missing:
         raise CodeangelError(f"{area}/ has no {', '.join(missing)} — {field('requires')}")
+
+    # A generator (e.g. create-expo-app) may have written files the preset also wants. Adopt them
+    # instead of skipping ours: move to the target path under a router-friendly header, unchanged.
+    for rule in meta.get("area", {}).get("adopt", []):
+        source, target = root / area / rule["from"], root / area / rule["to"]
+        if not source.is_file() or target.exists():
+            continue
+        body = source.read_text(encoding="utf-8")
+        if ADOPT_GUARD in body:
+            continue  # already a codeangel file
+        title = render(rule["title"], variables, "adopt title")
+        when = render(rule["when"], variables, "adopt when")
+        write(
+            target,
+            f"# {title}\n\n<!-- When: {when}. Adopted unchanged from the area's generator; "
+            f"routed to from {area}/AGENTS.md. -->\n\n{body.lstrip(chr(10))}",
+        )
+        source.unlink()
+        print(f"  adopted {area}/{rule['from']} → {area}/{rule['to']}")
 
     created: list[str] = []
     kept: list[str] = []

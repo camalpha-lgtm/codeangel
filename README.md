@@ -11,12 +11,15 @@ codeangel is a package manager for this setup, not a runtime dependency: everyth
 
 ## Install
 
-Python 3.11+.
+Python 3.11+, installed with [uv](https://docs.astral.sh/uv/).
 
 ```bash
-pipx install /path/to/codeangel      # or: pip install /path/to/codeangel
+uv tool install git+https://github.com/camalpha-lgtm/codeangel   # the `codeangel` command, on PATH
+uv tool install /path/to/codeangel                               # or from a local checkout
+uvx --from git+https://github.com/camalpha-lgtm/codeangel codeangel init   # or run once, no install
+uv tool upgrade codeangel                                        # later
 # developing codeangel itself:
-pip install -e ".[dev]"
+uv sync && uv run pytest
 ```
 
 ## Start a project
@@ -56,7 +59,7 @@ Project settings live in `.agents/codeangel.toml` (ticket pattern, spec dir, run
 ## Develop codeangel
 
 ```bash
-pip install -e ".[dev]" && pytest
+uv sync && uv run pytest
 ```
 
 The shipped files live in `src/codeangel/payload/`: `managed/`, `scaffold/` and `presets/<name>/`. `dot_x` in a payload path installs as `.x`, and `{{name}}` in a path or file is a template variable. See `AGENTS.md`.

@@ -1,0 +1,19 @@
+{
+  "codeangel": "0.1.0",
+  "files": {
+    ".agents/skills/build-implement/SKILL.md": "f70b8987bbfbfd5c7b0698e77b173ce3144249a15af6d780f2ae624eef8b5bab",
+    ".agents/skills/build-learn/SKILL.md": "36d9b5dc220e5ae8d15542be4bc36f86f4763809a6f7df7f1cd410808376c579",
+    ".agents/skills/build-loop/SKILL.md": "a5b777f7cce9cf72e535fe44a92ec5b918687b9f7e24394cd9f6f0f0a4613b04",
+    ".agents/skills/build-loop/assets/spec-template.md": "fbea330a501f9205af090d106e17502792eed1fe4f474e095cead3a06615714f",
+    ".agents/skills/build-loop/references/contract.md": "2c944984a9857a58c0d2808e087d0518c1fd8f2789f3db3ba4d4bb0699880385",
+    ".agents/skills/build-loop/references/stages.toml": "d3d7a9b56ef73734515780e5b3a8fc72f74f5185753eeb20f9f412691742f605",
+    ".agents/skills/build-loop/scripts/transition.py": "40f034fc6d54e8d4dd260ec6082947cae3b8e820df58c439b11f0d6c69341f4c",
+    ".agents/skills/build-plan/SKILL.md": "8114a026cc6b18f20f30f402b25c6c547eb1d4e62edd46048d81c60ef3c93b51",
+    ".agents/skills/build-review/SKILL.md": "a3f63261fbc6a6a55b4724997b12ce6b965bb5e5df3326602950191411ad88c7",
+    ".agents/skills/build-verify/SKILL.md": "daa15e42b20b1a595e9fd8a9c76e0130f5ff243a585a1b81cc492aac38e2e176",
+    ".agents/skills/worktree-cleanup/SKILL.md": "83c9fdc20ccb8e4c575ca6536d01bc606595641968b2708d84f7edd43200b0a7",
+    ".agents/sync-shims.py": "ff807f03077a31e3abc2e43751514250db8d8723ad91a40b9a7a413f5a9f4051",
+    ".claude/agents/build-verifier.md": "51e83e234fa5b9d884dffd8844af3f76ffca2f7041fe4d98b588503e1014857a",
+    "docs/ai/agent-docs.md": "f5b5eb1acac4592eb74836ddbbc0404f319da739751c5fec78c7fab5de12770c"
+  }
+}

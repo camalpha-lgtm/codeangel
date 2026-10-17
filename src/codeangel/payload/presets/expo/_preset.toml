@@ -1,13 +1,21 @@
 # codeangel preset metadata (not copied). Template vars: {{area}}, {{area_name}}, {{project_name}}, {{project_package}}, {{base_branch}}, plus [vars].
-description = "Expo / React Native app (TypeScript): docs, gates, SDK-version discipline, CI"
+description = "Expo / React Native app (TypeScript): docs, gates, SDK-version discipline, CI; adopts create-expo-app's own AGENTS.md"
 summary = "Expo / React Native app (TypeScript)"
 quick_start = "`cd {{area}}` → `npm install` → `npx expo start`"
 requires = "create the Expo app first, then add the preset: `npx create-expo-app@latest {{area}} --template blank-typescript` (it refuses a non-empty directory)"
-next = "`cd {{area}}` → `npm install` → `npx expo start`; read the SDK docs named in {{area}}/AGENTS.md before writing Expo code"
-ci = "| `{{area_name}}.yml` | {{area}}/: type check, lint |"
+next = "`cd {{area}}` → if `eslint.config.js` is missing run `npx expo lint` twice (the first run installs ESLint and exits 1) and commit the result → `npx expo start`; read the Expo docs for your SDK before writing Expo code"
+ci = "| `{{area_name}}.yml` | {{area}}/: type check, lint, Android bundle export |"
 
 [vars]
 
 [area]
 requires_files = ["package.json"]
 pre_remove = []
+
+# create-expo-app writes Expo's own agent guidance to AGENTS.md. Keep it (Expo maintains it) as on-demand
+# reference and install the area AGENTS.md router in its place.
+[[area.adopt]]
+from = "AGENTS.md"
+to = "docs/ai/expo-official.md"
+title = "Expo official agent guidance"
+when = "writing or changing Expo / React Native code, adding packages, routing, or EAS builds"
