@@ -3,7 +3,7 @@
 <!-- Shared by build-loop (coordinator) and every stage skill. Self-contained: stage skills may run in a subagent with no conversation history. Managed by codeangel: change it in the codeangel repo, then `codeangel update`. -->
 
 ## State
-- Config = `.agents/codeangel.toml`: `project` (name, base_branch, ticket_pattern, spec_dir, doc_map), `runtime.python`, `[[areas]]` (name, path, preset).
+- Config = `.agents/codeangel.toml`: `project` (name, base_branch, ticket_pattern, spec_dir, doc_map), `tracker.refine_ticket` (default true), `runtime.python`, `[[areas]]` (name, path, preset).
 - TICKET = tracker ID matching `project.ticket_pattern` (e.g. `ABC-123`). Spec = `<project.spec_dir>/<TICKET>.md` — the ONLY progress record; spec beats memory.
 - Map = `.agents/skills/build-loop/references/stages.toml`: per stage → `owner` skill, `entry`, `produces` (artefacts), legal exits, required checks. Read your stage's block before acting.
 - `T` = `<runtime.python> .agents/skills/build-loop/scripts/transition.py` (any cwd inside the repo; Python ≥ 3.11):

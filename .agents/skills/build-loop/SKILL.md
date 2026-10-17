@@ -1,6 +1,6 @@
 ---
 name: build-loop
-description: Coordinates ticket delivery for this repo — startup (worktree cleanup, ticket fetch from Linear, branch alignment), then dispatches the stage skills build-plan → build-implement → build-verify → build-review → build-learn over an enforced state machine, all state in a per-ticket spec file. Modes plan (stop after planning for approval, resume later) and immediate (run straight to done). Use when asked to build, implement, plan, work on, pick up, approve, or resume a ticket (ID like ABC-123).
+description: Coordinates ticket delivery for this repo — startup (worktree cleanup, ticket fetch from Linear and refinement of its title / description / acceptance criteria / out of scope, branch alignment), then dispatches the stage skills build-plan → build-implement → build-verify → build-review → build-learn over an enforced state machine, all state in a per-ticket spec file. Modes plan (stop after planning for approval, resume later) and immediate (run straight to done). Use when asked to build, implement, plan, work on, pick up, approve, or resume a ticket (ID like ABC-123).
 metadata:
   claude-argument-hint: "<TICKET-ID> [plan|immediate]"
 ---
@@ -32,6 +32,20 @@ BASE = `project.base_branch` from `.agents/codeangel.toml` (default `main`).
    3. Another tracker MCP / CLI the user named → same fields.
    4. Else ask the user to paste title + description (+ branch name); stop. Never invent requirements.
    TARGET = the tracker's suggested branch name; none → `<ticket-lowercase>-<title-slug>`.
+3b. **Refine the ticket** (new spec only; skip when `[tracker] refine_ticket = false` in the config, the source is not Linear, the ticket is Done / Canceled, or the description already contains `<!-- codeangel:refined -->`). Rewrite the tracker ticket so it reads well and states what "done" means. Best-effort: any failure → log one line, continue with the refined text in the spec only. Never blocks.
+   1. **Draft** from the ticket text + comments only — restructure and clarify, never add requirements:
+      - Title: one line, ≤ 80 chars, outcome-first, same meaning. Already clear → keep it verbatim.
+      - Description, markdown, in this order (drop a section only when it would be empty):
+        `## Summary` (1–3 sentences: what and why) · `## Context` (background, links, repro, constraints from the original) · `## Acceptance criteria` (`- [ ]` one observable, testable behaviour per line; behaviour the ticket states or clearly implies — nothing else) · `## Out of scope` (≥ 1 line: adjacent work the ticket does not ask for, or that the original excludes) · `## Open questions` (anything ambiguous or missing that changes the work — ask, don't guess).
+      - Keep every link, image, code block, mention, number and name from the original. Don't drop information; move it under the right heading.
+      - End the description with `<!-- codeangel:refined -->`.
+   2. **Preserve the original** — first, post it as a comment on the ticket: `save_comment` (`issueId` = TICKET) body `Original ticket, before refinement
+
+**Title:** <title>
+
+<description verbatim>`. Comment not posted → do NOT overwrite; skip to the spec.
+   3. **Write** — Linear MCP: `save_issue` (`id` = TICKET, `title`, `description`; change nothing else — not state, labels, assignee, priority). API: `issueUpdate` with `title` + `description` via the same GraphQL endpoint.
+   4. Use the refined title as the ticket title from here on; hand build-plan the refined AC / out of scope as its starting draft, the Open questions as risks, and the ORIGINAL text as the verbatim ticket (§Ticket).
 4. **Workspace alignment** — `git fetch --prune origin`; CUR = `git branch --show-current`; OWN = `git rev-list --count origin/<BASE>..HEAD`. Uncommitted changes not belonging to TICKET → stop. First matching case:
    | case | action |
    |---|---|
@@ -50,7 +64,7 @@ BASE = `project.base_branch` from `.agents/codeangel.toml` (default `main`).
 2. Act on S:
    | S | owner | how |
    |---|---|---|
-   | PLAN | `build-plan` | inline; pass MODE, ticket text, TARGET, url, source, and STARTUP risks |
+   | PLAN | `build-plan` | inline; pass MODE, original ticket text, refined title + AC + out of scope + open questions (if step 3b ran), TARGET, url, source, and STARTUP risks |
    | IMPLEMENT | `build-implement` | inline |
    | VERIFY | `build-verify` | ISOLATED: a fresh subagent that did not write the code (Claude Code: invoking the skill does this automatically; other harnesses: spawn a fresh subagent with the skill if possible, else inline) |
    | REVIEW | `build-review` | inline — may end the turn while waiting on CI |

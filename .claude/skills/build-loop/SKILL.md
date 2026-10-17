@@ -1,6 +1,6 @@
 ---
 name: build-loop
-description: "Coordinates ticket delivery for this repo — startup (worktree cleanup, ticket fetch from Linear, branch alignment), then dispatches the stage skills build-plan → build-implement → build-verify → build-review → build-learn over an enforced state machine, all state in a per-ticket spec file. Modes plan (stop after planning for approval, resume later) and immediate (run straight to done). Use when asked to build, implement, plan, work on, pick up, approve, or resume a ticket (ID like ABC-123)."
+description: "Coordinates ticket delivery for this repo — startup (worktree cleanup, ticket fetch from Linear and refinement of its title / description / acceptance criteria / out of scope, branch alignment), then dispatches the stage skills build-plan → build-implement → build-verify → build-review → build-learn over an enforced state machine, all state in a per-ticket spec file. Modes plan (stop after planning for approval, resume later) and immediate (run straight to done). Use when asked to build, implement, plan, work on, pick up, approve, or resume a ticket (ID like ABC-123)."
 argument-hint: "<TICKET-ID> [plan|immediate]"
 ---
 
