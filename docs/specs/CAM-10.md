@@ -6,7 +6,7 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-10/rename-the-installed-agents-folder-to-codeangel
 branch: camerondhobbs/cam-10-rename-agents-to-codeangel
 base_sha: 87a707d5c869eccdf432c835de1f311b82e0d979
-pr:
+pr: https://github.com/camalpha-lgtm/codeangel/pull/2
 stage: REVIEW  # managed by transition.py — see stages.toml
 last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
@@ -183,7 +183,7 @@ Refined by build-loop STARTUP (Linear title/description rewritten; original kept
 -->
 
 ## Review
-- PR: <url>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/2
 - CI runs: <!-- <run id> <sha> <conclusion> -->
 - Ready for review: <UTC time | not marked: reason>
 
