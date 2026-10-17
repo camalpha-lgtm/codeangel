@@ -7,7 +7,7 @@ from support import run
 
 class TestSync:
     def test_sync_check_detects_and_fixes_drift(self, project: Path):
-        skill = project / ".agents/skills/build-learn/SKILL.md"
+        skill = project / ".codeangel/skills/build-learn/SKILL.md"
         skill.write_text(
             skill.read_text(encoding="utf-8").replace(
                 "description: Stage", "description: Edited stage", 1

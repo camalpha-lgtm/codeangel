@@ -2,7 +2,7 @@
 
 An agent-agnostic AI software factory you install into any repo. One command gives a project:
 
-- **Skills** in the open [Agent Skills](https://agentskills.io/specification) format (`.agents/skills/`), readable by Claude Code, Cursor and Codex: a `build-loop` coordinator plus one skill per stage (`build-plan`, `build-implement`, `build-verify`, `build-review`, `build-learn`) and `worktree-cleanup`.
+- **Skills** in the open [Agent Skills](https://agentskills.io/specification) format (`.codeangel/skills/`), readable by Claude Code, Cursor and Codex: a `build-loop` coordinator plus one skill per stage (`build-plan`, `build-implement`, `build-verify`, `build-review`, `build-learn`) and `worktree-cleanup`.
 - **An enforced build loop.** A state machine (`stages.toml` + `transition.py`) takes a ticket from plan to implement to verify to review to learn. It refuses illegal moves and unmet checks, and `plan` / `immediate` modes let you approve a plan before any code is written. Verification runs in an isolated subagent.
 - **Self-maintaining agent docs.** Small `AGENTS.md` routers per area, `docs/ai/` reference, learnings, and a doc map so docs are updated in the same PR as the code they describe — the loop refuses to pass verification otherwise.
 - **Presets** for common areas: `django-drf` (Django + Django REST Framework API) and `expo` (React Native).
@@ -43,7 +43,7 @@ Then fill the `TODO`s in `AGENTS.md` and `docs/ai/product.md`, and drive tickets
 | `codeangel init [--name N] [--base-branch B] [--python CMD]` | install managed files, scaffold project-owned docs, generate Claude shims |
 | `codeangel add <preset> <path>` | add an area: files, doc-map rules, router rows, CI workflow, config entry (idempotent) |
 | `codeangel update [--force]` | refresh managed files; a locally edited file is never overwritten — the new version lands next to it as `<file>.codeangel-new` |
-| `codeangel sync [--check]` | regenerate the Claude Code skill shims from `.agents/skills/` |
+| `codeangel sync [--check]` | regenerate the Claude Code skill shims from `.codeangel/skills/` |
 | `codeangel doctor` | check config, lock, shims, state machine, doc map, doc links, `AGENTS.md` size |
 | `codeangel presets` | list presets |
 
@@ -51,11 +51,11 @@ Then fill the `TODO`s in `AGENTS.md` and `docs/ai/product.md`, and drive tickets
 
 | owner | files | change how |
 |---|---|---|
-| managed (hashes in `.agents/codeangel.lock.json`) | `.agents/skills/{build-*,worktree-cleanup}/**`, `.agents/sync-shims.py`, `.claude/agents/build-verifier.md`, `docs/ai/agent-docs.md` | in this repo, then `codeangel update` |
+| managed (hashes in `.codeangel/codeangel.lock.json`) | `.codeangel/skills/{build-*,worktree-cleanup}/**`, `.codeangel/sync-shims.py`, `.claude/agents/build-verifier.md`, `docs/ai/agent-docs.md` | in this repo, then `codeangel update` |
 | generated | `.claude/skills/*/SKILL.md` | `codeangel sync` |
-| project-owned | `AGENTS.md` files, other `docs/ai/*`, doc map, learnings, `README.md`, `.agents/codeangel.toml`, CI workflows | edit freely; created once, never touched again |
+| project-owned | `AGENTS.md` files, other `docs/ai/*`, doc map, learnings, `README.md`, `.codeangel/codeangel.toml`, CI workflows | edit freely; created once, never touched again |
 
-Project settings live in `.agents/codeangel.toml` (ticket pattern, spec dir, runtime Python, areas). Skills read each area's `AGENTS.md` → `## Done` for its gates, so they work for any stack.
+Project settings live in `.codeangel/codeangel.toml` (ticket pattern, spec dir, runtime Python, areas). Skills read each area's `AGENTS.md` → `## Done` for its gates, so they work for any stack.
 
 ## Develop codeangel
 
@@ -67,4 +67,4 @@ The CLI lives in `src/codeangel/`, split into `commands`, `doctor`, `install`, `
 
 The shipped files live in `src/codeangel/payload/`: `managed/`, `scaffold/` and `presets/<name>/`. `dot_x` in a payload path installs as `.x`, and `{{name}}` in a path or file is a template variable. See `AGENTS.md`.
 
-A child project records the installed release in `[codeangel] version` inside `.agents/codeangel.toml`. `codeangel doctor` warns when that value disagrees with the CLI. Pin the install to a tag, as in the install block above.
+A child project records the installed release in `[codeangel] version` inside `.codeangel/codeangel.toml`. `codeangel doctor` warns when that value disagrees with the CLI. Pin the install to a tag, as in the install block above.

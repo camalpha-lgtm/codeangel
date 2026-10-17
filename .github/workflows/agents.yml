@@ -15,5 +15,5 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Claude skill shims in sync with .agents/skills
-        run: python .agents/sync-shims.py --check
+      - name: Claude skill shims in sync with .codeangel/skills
+        run: python .codeangel/sync-shims.py --check

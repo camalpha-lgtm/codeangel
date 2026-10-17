@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-10/rename-the-installed-agents-
 branch: camerondhobbs/cam-10-rename-agents-to-codeangel
 base_sha: 87a707d5c869eccdf432c835de1f311b82e0d979
 pr:
-stage: IMPLEMENT  # managed by transition.py — see stages.toml
-last_status: planned  # exit status that entered the current stage
+stage: REVIEW  # managed by transition.py — see stages.toml
+last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T15:14Z
-updated: 2026-10-17T15:15Z
+updated: 2026-10-17T15:18Z
 ---
 
 # CAM-10: Rename the installed .agents folder to .codeangel
@@ -30,10 +30,10 @@ Comments: none.
 Refined by build-loop STARTUP (Linear title/description rewritten; original kept as a Linear comment): title "Rename the installed .agents folder to .codeangel".
 
 ## Acceptance criteria
-- [ ] AC-1: `codeangel init` installs the managed skills, `sync-shims.py`, `codeangel.toml` and `codeangel.lock.json` under `.codeangel/` in a child project and creates no `.agents/` folder; `add`, `update`, `sync` and `doctor` read and write only `.codeangel/` paths (payload sources are `dot_codeangel/`, the `dot_x` → `.x` mapping is unchanged).
-- [ ] AC-2: This repo's own `.agents/` folder is renamed to `.codeangel/` in this PR: `.agents/` no longer exists, `.codeangel/` holds the config, lock file, skills and `sync-shims.py`, the lock file keys are `.codeangel/...` paths, the Claude shims under `.claude/skills/` are regenerated to point at `.codeangel/`, and `codeangel doctor` and `sync --check` pass on the repo.
-- [ ] AC-3: No file under `src/`, `tests/`, `.codeangel/`, `.claude/`, `.github/`, `README.md`, `AGENTS.md` or `docs/ai/` names the old `.agents` folder or the `dot_agents` payload directory: every path, instruction, doc line, CI step and message points at `.codeangel`. `AGENTS.md` (the root agent-instructions file) and `.claude/agents/` are not renamed.
-- [ ] AC-4: Tests, ruff check, ruff format check and the standards tests (`tests/harness`) pass (implied).
+- [x] AC-1: `codeangel init` installs the managed skills, `sync-shims.py`, `codeangel.toml` and `codeangel.lock.json` under `.codeangel/` in a child project and creates no `.agents/` folder; `add`, `update`, `sync` and `doctor` read and write only `.codeangel/` paths (payload sources are `dot_codeangel/`, the `dot_x` → `.x` mapping is unchanged).
+- [x] AC-2: This repo's own `.agents/` folder is renamed to `.codeangel/` in this PR: `.agents/` no longer exists, `.codeangel/` holds the config, lock file, skills and `sync-shims.py`, the lock file keys are `.codeangel/...` paths, the Claude shims under `.claude/skills/` are regenerated to point at `.codeangel/`, and `codeangel doctor` and `sync --check` pass on the repo.
+- [x] AC-3: No file under `src/`, `tests/`, `.codeangel/`, `.claude/`, `.github/`, `README.md`, `AGENTS.md` or `docs/ai/` names the old `.agents` folder or the `dot_agents` payload directory: every path, instruction, doc line, CI step and message points at `.codeangel`. `AGENTS.md` (the root agent-instructions file) and `.claude/agents/` are not renamed.
+- [x] AC-4: Tests, ruff check, ruff format check and the standards tests (`tests/harness`) pass (implied).
 
 ## Out of scope
 - Migrating existing child projects that already have `.agents/` (moving the folder, rewriting their lock file); `update` does not detect or move it.
@@ -115,7 +115,7 @@ Refined by build-loop STARTUP (Linear title/description rewritten; original kept
 | tests/cli/test_doctor.py::TestDoctor::test_doctor_flags_a_deleted_managed_file | AC-1 | deleting `.codeangel/skills/build-verify/SKILL.md` is reported |
 | tests/cli/test_build_loop_script.py::TestBuildLoopScript::test_map_loads_in_an_installed_project | AC-1 | the installed `.codeangel/.../transition.py` loads its map |
 | tests/cli/test_versioning.py::TestVersioning::test_project_config_records_the_installed_version | AC-1 | `[codeangel] version` in `.codeangel/codeangel.toml` and `.codeangel/codeangel.lock.json` equal `__version__` |
-| tests/harness/test_payload.py::TestPayload::test_payload_ships_dot_codeangel_not_dot_agents | AC-1 | `payload/managed/dot_codeangel` and `payload/scaffold/dot_codeangel` exist; no `dot_agents` directory exists in the payload |
+| tests/harness/test_payload.py::TestPayload::test_payload_ships_dot_codeangel_only | AC-1 | `payload/managed/dot_codeangel` and `payload/scaffold/dot_codeangel` exist; no `dot_agents` directory exists in the payload |
 | tests/harness/test_payload.py::TestPayload::test_repo_uses_codeangel_folder_not_agents | AC-2 | repo root has `.codeangel/{codeangel.toml,codeangel.lock.json,sync-shims.py,skills}` and no `.agents`; every lock key starts with `.codeangel/`, `.claude/` or `docs/` |
 | tests/harness/test_payload.py::TestPayload::test_no_file_references_the_old_agents_folder | AC-3 | regex scan of `src/`, `tests/`, `.codeangel/`, `.claude/`, `.github/`, `README.md`, `AGENTS.md`, `docs/ai/` finds no `.agents` path and no `dot_agents` (`AGENTS.md`, `.claude/agents/` do not match) |
 | tests/harness/test_architecture.py::TestObjectOrientedDesign::test_only_main_is_a_module_level_function | AC-4 | standards tests still pass on the changed source |
@@ -151,8 +151,23 @@ Refined by build-loop STARTUP (Linear title/description rewritten; original kept
 
 ## Plan amendments
 <!-- - <UTC time> <what changed> — <why> -->
+- 2026-10-17T15:40Z Renamed test `test_payload_ships_dot_codeangel_not_dot_agents` to `test_payload_ships_dot_codeangel_only` — the no-reference scan (AC-3) would otherwise match its own name; added `OLD_FOLDER` to `tests/support/__init__.py` (in Affected files already) so tests do not spell the old name; the scan skips `*.egg-info` build output.
 
 ## Verify reports
+### Attempt 1 — PASS
+- V1 lint/format: PASS `ruff check src tests` exit 0; `ruff format --check src tests` 66 files already formatted; no file modified
+- V2 schema drift: PASS (skipped: this repo has no schema or migrations)
+- V3 full suite: PASS 64 passed, 0 failed (baseline 60 passed, 0 failed); `sync-shims.py --check` exit 0; `codeangel doctor` 0 problems, 0 warnings
+- V4 planned tests: PASS all 17 Test plan ids exist and pass
+- V5 AC audit: PASS
+  - AC-1: tests/cli/test_init.py::TestInit::test_installs_codeangel_folder_and_no_agents_folder; tests/cli/test_init.py:24 (plus test_init.py:12, :34; tests/install/test_payload_tree.py:9; tests/project/test_project.py:12; tests/cli/test_add.py:10; tests/cli/test_update.py:30, :42; tests/cli/test_sync.py:9; tests/cli/test_doctor.py:12; tests/harness/test_payload.py:28). Manual smoke: `init` in a temp dir creates `.codeangel/` and no `.agents`; `doctor` and `update` clean.
+  - AC-2: tests/harness/test_payload.py::TestPayload::test_repo_uses_codeangel_folder_not_agents; tests/harness/test_payload.py:33. `.agents/` absent, lock keys start with `.codeangel/`, `.claude/` or `docs/`; `sync --check` and `doctor` pass on the repo.
+  - AC-3: tests/harness/test_payload.py::TestPayload::test_no_file_references_the_old_agents_folder; tests/harness/test_payload.py:41. Independent grep for `.agents` / `dot_agents` over src, tests, .codeangel, .claude, .github, README.md, AGENTS.md, docs/ai returned nothing; `AGENTS.md` and `.claude/agents/` untouched.
+  - AC-4: tests/harness/test_architecture.py::TestObjectOrientedDesign::test_only_main_is_a_module_level_function; tests/harness/test_code_style.py::TestNoComments::test_source_has_no_comments_or_docstrings; full suite, ruff check and ruff format check all green.
+- V6 scope audit: PASS every changed path is within Affected files (the extra `M` entries in `git status` for code-standards.md, learnings, dot_gitignore, project/__init__.py, project/runtime.py are line-ending-only and have no content diff); no Out-of-scope item done
+- V7 hygiene: PASS no debug output, comments, TODOs, secrets or machine paths in the src/tests diff; the plan amendment (test rename, `OLD_FOLDER`, egg-info skip) is recorded
+- V8 docs in sync: PASS `T docs` reports docs_synced ready; README.md, AGENTS.md, repo-map, git-workflow, agent-docs, doc-map and product docs read against the code and accurate
+
 <!--
 ### Attempt 1 — PASS|FAIL
 - V1 lint/format: PASS|FAIL <detail>
@@ -178,3 +193,5 @@ Refined by build-loop STARTUP (Linear title/description rewritten; original kept
 ## Log
 - 2026-10-17T15:14Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-10-rename-agents-to-codeangel, base=87a707d5c8
 - 2026-10-17T15:15Z PLAN → IMPLEMENT [planned] attempt=0/5
+- 2026-10-17T15:17Z IMPLEMENT → VERIFY [implemented] attempt=0/5
+- 2026-10-17T15:18Z VERIFY → REVIEW [pass] attempt=0/5

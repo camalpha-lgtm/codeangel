@@ -15,7 +15,7 @@ codeangel is a Python CLI (stdlib only, Python ≥ 3.11) that installs an agent-
 
 ## Payload rules
 - A path part `dot_x` installs as `.x`; `{{name}}` (lowercase identifier) in a path or file is a template variable: `project_name`, `project_package`, `base_branch`, `python`, `python_toml`, `codeangel_version`, and for presets `area`, `area_name`, plus `[vars]`.
-- `managed/` is project-agnostic: no framework, package manager, or product names (a test enforces it). Project specifics belong in `.agents/codeangel.toml` or an area's `AGENTS.md` → `## Done`.
+- `managed/` is project-agnostic: no framework, package manager, or product names (a test enforces it). Project specifics belong in `.codeangel/codeangel.toml` or an area's `AGENTS.md` → `## Done`.
 - Skills follow the Agent Skills spec; harness-only frontmatter goes in `metadata` as `claude-<field>`; `sync-shims.py` turns that into the Claude shim.
 - Editing a managed file changes what `codeangel update` ships. Projects keep local edits; they get the new version as `<file>.codeangel-new`.
 - Presets name only their own stack. Verify every preset's commands by running them in a generated project before shipping.

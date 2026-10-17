@@ -28,21 +28,21 @@ class TestUpdate:
         assert Lockfile(project).load() == before
 
     def test_refreshes_files_the_user_has_not_touched(self, project: Path, newer_payload: Path):
-        shipped = newer_payload / "dot_agents/skills/build-plan/SKILL.md"
+        shipped = newer_payload / "dot_codeangel/skills/build-plan/SKILL.md"
         shipped.write_text(shipped.read_text(encoding="utf-8") + "\nNEW RULE\n", encoding="utf-8")
 
         assert run(project, "update") == 0
 
-        local = project / ".agents/skills/build-plan/SKILL.md"
+        local = project / ".codeangel/skills/build-plan/SKILL.md"
         assert "NEW RULE" in local.read_text(encoding="utf-8")
         assert Lockfile(project).load()[
-            ".agents/skills/build-plan/SKILL.md"
+            ".codeangel/skills/build-plan/SKILL.md"
         ] == ContentDigest().hexdigest(local.read_bytes())
 
     def test_never_overwrites_local_edits(self, project: Path, newer_payload: Path):
-        local = project / ".agents/skills/build-plan/SKILL.md"
+        local = project / ".codeangel/skills/build-plan/SKILL.md"
         local.write_text(local.read_text(encoding="utf-8") + "\nMY TWEAK\n", encoding="utf-8")
-        shipped = newer_payload / "dot_agents/skills/build-plan/SKILL.md"
+        shipped = newer_payload / "dot_codeangel/skills/build-plan/SKILL.md"
         shipped.write_text(shipped.read_text(encoding="utf-8") + "\nNEW RULE\n", encoding="utf-8")
 
         assert run(project, "update") == 0
@@ -53,9 +53,9 @@ class TestUpdate:
         assert "NEW RULE" in proposal.read_text(encoding="utf-8")
 
     def test_force_overwrites_and_clears_the_proposal(self, project: Path, newer_payload: Path):
-        local = project / ".agents/skills/build-plan/SKILL.md"
+        local = project / ".codeangel/skills/build-plan/SKILL.md"
         local.write_text(local.read_text(encoding="utf-8") + "\nMY TWEAK\n", encoding="utf-8")
-        shipped = newer_payload / "dot_agents/skills/build-plan/SKILL.md"
+        shipped = newer_payload / "dot_codeangel/skills/build-plan/SKILL.md"
         shipped.write_text(shipped.read_text(encoding="utf-8") + "\nNEW RULE\n", encoding="utf-8")
         assert run(project, "update") == 0
 
@@ -68,14 +68,14 @@ class TestUpdate:
     def test_removes_files_no_longer_shipped_unless_edited(
         self, project: Path, newer_payload: Path
     ):
-        (newer_payload / "dot_agents/skills/worktree-cleanup/SKILL.md").unlink()
+        (newer_payload / "dot_codeangel/skills/worktree-cleanup/SKILL.md").unlink()
         (newer_payload / "dot_claude/agents/build-verifier.md").unlink()
         edited = project / ".claude/agents/build-verifier.md"
         edited.write_text(edited.read_text(encoding="utf-8") + "\nmine\n", encoding="utf-8")
 
         assert run(project, "update") == 0
 
-        assert not (project / ".agents/skills/worktree-cleanup/SKILL.md").exists()
+        assert not (project / ".codeangel/skills/worktree-cleanup/SKILL.md").exists()
         assert edited.exists()
 
     def test_leaves_project_owned_files_alone(self, project: Path):

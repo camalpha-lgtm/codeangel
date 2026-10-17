@@ -10,7 +10,7 @@ class TestDoctor:
         assert run(backend_project, "doctor") == 0
 
     def test_doctor_flags_a_deleted_managed_file(self, project: Path):
-        (project / ".agents/skills/build-verify/SKILL.md").unlink()
+        (project / ".codeangel/skills/build-verify/SKILL.md").unlink()
 
         assert run(project, "doctor") == 1
 

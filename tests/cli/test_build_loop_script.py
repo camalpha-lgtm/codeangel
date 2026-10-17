@@ -27,7 +27,7 @@ class TestBuildLoopScript:
         assert result.returncode == 0, result.stdout
 
     def test_specs_land_in_the_configured_spec_dir(self, project: Path):
-        config = project / ".agents/codeangel.toml"
+        config = project / ".codeangel/codeangel.toml"
         config.write_text(
             config.read_text(encoding="utf-8").replace(
                 'spec_dir = "docs/specs"', 'spec_dir = "work/specs"'
@@ -41,7 +41,7 @@ class TestBuildLoopScript:
         assert (project / "work/specs/ABC-1.md").is_file()
 
     def test_ticket_pattern_comes_from_config(self, project: Path):
-        config = project / ".agents/codeangel.toml"
+        config = project / ".codeangel/codeangel.toml"
         config.write_text(
             config.read_text(encoding="utf-8").replace("'^[A-Z][A-Z0-9]+-\\d+$'", "'^FF-\\d+$'"),
             encoding="utf-8",

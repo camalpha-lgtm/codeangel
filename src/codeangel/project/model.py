@@ -11,10 +11,10 @@ from codeangel.io.errors import CodeangelError
 
 
 class Paths:
-    CONFIG = ".agents/codeangel.toml"
-    LOCK = ".agents/codeangel.lock.json"
-    SYNC = ".agents/sync-shims.py"
-    TRANSITION = ".agents/skills/build-loop/scripts/transition.py"
+    CONFIG = ".codeangel/codeangel.toml"
+    LOCK = ".codeangel/codeangel.lock.json"
+    SYNC = ".codeangel/sync-shims.py"
+    TRANSITION = ".codeangel/skills/build-loop/scripts/transition.py"
 
 
 class Project:

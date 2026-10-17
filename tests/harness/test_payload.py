@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
 import pytest
-from support import PYTHON, run
+from support import OLD_FOLDER, PYTHON, run
 
 from codeangel.cli import main
 from codeangel.install.tree import PAYLOAD
@@ -21,6 +22,36 @@ class TestPayload:
         for path in PAYLOAD.managed.base.rglob("*"):
             if path.is_file() and banned.search(path.read_text(encoding="utf-8")):
                 offenders.append(path.relative_to(PAYLOAD.root).as_posix())
+
+        assert offenders == []
+
+    def test_payload_ships_dot_codeangel_only(self):
+        assert (PAYLOAD.managed.base / "dot_codeangel").is_dir()
+        assert (PAYLOAD.scaffold.base / "dot_codeangel").is_dir()
+        assert list(PAYLOAD.root.rglob("dot_" + "agents")) == []
+
+    def test_repo_uses_codeangel_folder_not_agents(self):
+        folder = ROOT / ".codeangel"
+        for name in ("codeangel.toml", "codeangel.lock.json", "sync-shims.py", "skills"):
+            assert (folder / name).exists()
+        assert not (ROOT / OLD_FOLDER).exists()
+        keys = json.loads((folder / "codeangel.lock.json").read_text(encoding="utf-8"))["files"]
+        assert all(key.startswith((".codeangel/", ".claude/", "docs/")) for key in keys)
+
+    def test_no_file_references_the_old_agents_folder(self):
+        pattern = re.compile(r"(?<![\w])" + re.escape(OLD_FOLDER) + r"\b|dot_" + "agents")
+        roots = ["src", "tests", ".codeangel", ".claude", ".github", "docs/ai"]
+        files = [ROOT / "README.md", ROOT / "AGENTS.md"]
+        for name in roots:
+            files.extend(p for p in (ROOT / name).rglob("*") if p.is_file())
+        offenders = [
+            path.relative_to(ROOT).as_posix()
+            for path in files
+            if "__pycache__" not in path.parts
+            and not any(part.endswith(".egg-info") for part in path.parts)
+            and path.suffix != ".pyc"
+            and pattern.search(path.read_text(encoding="utf-8"))
+        ]
 
         assert offenders == []
 
@@ -68,10 +99,12 @@ class TestHarnessStandards:
             r"poetry|prek|pytest|\bruff\b|actually|backend/|makemigrations|azure", re.I
         )
         managed = PAYLOAD.managed.base
-        implement = (managed / "dot_agents/skills/build-implement/SKILL.md").read_text(
+        implement = (managed / "dot_codeangel/skills/build-implement/SKILL.md").read_text(
             encoding="utf-8"
         )
-        verify = (managed / "dot_agents/skills/build-verify/SKILL.md").read_text(encoding="utf-8")
+        verify = (managed / "dot_codeangel/skills/build-verify/SKILL.md").read_text(
+            encoding="utf-8"
+        )
         assert "code standards" in implement.lower()
         assert "code standards" in verify.lower()
         offenders = [

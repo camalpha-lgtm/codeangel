@@ -29,7 +29,9 @@ class TestAdd:
         assert "codeangel:preset django-drf backend" in (root / "docs/ai/doc-map.toml").read_text(
             encoding="utf-8"
         )
-        assert 'path = "backend"' in (root / ".agents/codeangel.toml").read_text(encoding="utf-8")
+        assert 'path = "backend"' in (root / ".codeangel/codeangel.toml").read_text(
+            encoding="utf-8"
+        )
 
     def test_no_unresolved_template_variables(self, backend_project: Path):
         leftovers = [
@@ -47,7 +49,7 @@ class TestAdd:
             "docs/ai/repo-map.md",
             "docs/ai/doc-map.toml",
             "docs/ai/git-workflow.md",
-            ".agents/codeangel.toml",
+            ".codeangel/codeangel.toml",
         ]
         before = {name: (backend_project / name).read_text(encoding="utf-8") for name in tracked}
 
