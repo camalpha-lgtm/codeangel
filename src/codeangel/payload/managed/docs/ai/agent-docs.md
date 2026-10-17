@@ -49,6 +49,9 @@ learning (observed gotcha) → area `docs/ai/<topic>.md` once it is a standing r
 - Skill bodies are self-contained: repo-relative paths, never assume conversation history (a skill may run in a subagent).
 - Project-specific skill → `.agents/skills/<name>/` (unmanaged) → run the shim sync → commit both.
 
+## Code standards
+The rule lives in the root `AGENTS.md`. The detail lives in `docs/ai/code-standards.md`. `build-implement` follows those standards. `build-verify` V7 checks them. Where a tool can enforce a standard, the project's linter config does, and the same change updates that config.
+
 ## Build loop = coordinator + stage skills
 `build-loop` coordinates (startup, modes, dispatch); one skill per stage (`build-plan`, `build-implement`, `build-verify`, `build-review`, `build-learn`) owns that stage's procedure. Shared rules: `.agents/skills/build-loop/references/contract.md`; stage → owner, exits, checks, artefacts: `.agents/skills/build-loop/references/stages.toml` (enforced by `.agents/skills/build-loop/scripts/transition.py`). Project specifics come from `.agents/codeangel.toml` and each area's `AGENTS.md` → `## Done`.
 Subagents only where isolation pays: `build-verify` runs as `build-verifier` (fresh context, judges the spec not the author, edits only the spec). Other stages stay inline — they talk to the user (plan approval), end the turn to wait on CI (review), or need continuity. To isolate another stage: add `claude-context: fork` + `claude-agent` to its metadata, add a `.claude/agents/` definition, re-sync.

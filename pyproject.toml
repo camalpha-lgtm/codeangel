@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codeangel"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Agent-agnostic AI software factory: skills, an enforced build loop, and self-maintaining agent docs for any repo."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,6 +16,9 @@ dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]
 codeangel = "codeangel.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "codeangel.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -29,8 +32,15 @@ target-version = "py311"
 extend-exclude = ["src/codeangel/payload/presets"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP"]
+select = ["E", "F", "I", "B", "UP", "C90", "PLR0912", "PLR0915", "ERA"]
 ignore = ["E501"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"src/codeangel/payload/**" = ["C901"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["tests"]

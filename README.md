@@ -18,6 +18,7 @@ uv tool install git+https://github.com/camalpha-lgtm/codeangel   # the `codeange
 uv tool install /path/to/codeangel                               # or from a local checkout
 uvx --from git+https://github.com/camalpha-lgtm/codeangel codeangel init   # or run once, no install
 uv tool upgrade codeangel                                        # later
+uv tool install git+https://github.com/camalpha-lgtm/codeangel@vX.Y.Z   # pin a release tag
 # developing codeangel itself:
 uv sync && uv run pytest
 ```
@@ -62,4 +63,8 @@ Project settings live in `.agents/codeangel.toml` (ticket pattern, spec dir, run
 uv sync && uv run pytest
 ```
 
+The CLI lives in `src/codeangel/`, split into `commands`, `doctor`, `install`, `io`, and `project`. `cli.py` is the entry point. Tests are grouped as `cli`, `install`, `io`, `project`, and `harness`, with shared helpers in `support`. Standards: `docs/ai/code-standards.md`.
+
 The shipped files live in `src/codeangel/payload/`: `managed/`, `scaffold/` and `presets/<name>/`. `dot_x` in a payload path installs as `.x`, and `{{name}}` in a path or file is a template variable. See `AGENTS.md`.
+
+A child project records the installed release in `[codeangel] version` inside `.agents/codeangel.toml`. `codeangel doctor` warns when that value disagrees with the CLI. Pin the install to a tag, as in the install block above.

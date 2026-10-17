@@ -1,0 +1,2 @@
+class CodeangelError(Exception):
+    pass
