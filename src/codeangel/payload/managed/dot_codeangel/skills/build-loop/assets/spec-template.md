@@ -2,7 +2,7 @@
 ticket: <TICKET>
 title: <ticket title>
 mode: plan   # plan | immediate — approval of a plan sets immediate
-source: <linear-mcp | linear-api | user-paste | other>
+source: <linear-mcp | user-paste | other>
 url: <linear issue url | none>
 branch: <Linear suggested branch name>
 base_sha: <sha>

@@ -653,7 +653,7 @@ def main() -> int:
     init.add_argument("--url", default="none")
     init.add_argument(
         "--source",
-        choices=["linear-mcp", "linear-api", "user-paste", "other"],
+        choices=["linear-mcp", "user-paste", "other"],
         default="user-paste",
     )
     init.set_defaults(handler=cmd_init)

@@ -8,6 +8,7 @@ metadata:
 # build-loop — coordinator
 
 Input: TICKET (upper-case it) + optional MODE (`plan` | `immediate`), from the invocation arguments or the user's message. No TICKET → ask, stop.
+Tools: the Linear MCP for tracker reads and writes, the GitHub MCP for pull-request operations; `codeangel init` installs both in `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor). No API clients.
 Read first: `references/contract.md` (shared rules, config, `T` commands). State machine: `references/stages.toml`. Spec template: `assets/spec-template.md`.
 BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
 
@@ -29,11 +30,10 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
 2. **Spec**: the ticket's spec exists on this branch or on `origin/<ticket branch>` → read it; MODE + its stage pick the §Modes row. Its `branch` is TARGET.
 3. **Ticket** (new spec only) — first source that works:
    1. Linear MCP (tool names contain `linear`): `get_issue` with `id` = TICKET and `fields` [title, description, url, status, labels, gitBranchName]; comments via `list_comments`. Suggested branch = `gitBranchName`.
-   2. `LINEAR_API_KEY` set → `curl -s https://api.linear.app/graphql -H "Authorization: $LINEAR_API_KEY" -H "Content-Type: application/json" -d '{"query":"{ issue(id: \"<TICKET>\") { identifier title description url branchName state { name } labels { nodes { name } } comments { nodes { body } } } }"}'`
-   3. Another tracker MCP / CLI the user named → same fields.
-   4. Else ask the user to paste title + description (+ branch name); stop. Never invent requirements.
+   2. Another tracker MCP / CLI the user named → same fields.
+   3. Else ask the user to paste title + description (+ branch name); stop. Never invent requirements. No API clients (no keys, no raw HTTP calls): the Linear MCP is the tracker interface (`references/contract.md` → Tools).
    TARGET = the tracker's suggested branch name; none → `<ticket-lowercase>-<title-slug>`.
-3b. **Refine the ticket** (new spec only; skip when `[tracker] refine_ticket = false` in the config, the source is not Linear, the ticket is Done / Canceled, or the description already contains `<!-- codeangel:refined -->`). Rewrite the tracker ticket so it reads well and states what "done" means. Best-effort: any failure → log one line, continue with the refined text in the spec only. Never blocks.
+3b. **Refine the ticket** (new spec only; skip when `[tracker] refine_ticket = false` in the config, the source is not the Linear MCP, the ticket is Done / Canceled, or the description already contains `<!-- codeangel:refined -->`). Rewrite the tracker ticket so it reads well and states what "done" means. Best-effort: any failure → log one line, continue with the refined text in the spec only. Never blocks.
    1. **Draft** from the ticket text + comments only — restructure and clarify, never add requirements:
       - Title: one line, ≤ 80 chars, outcome-first, same meaning. Already clear → keep it verbatim.
       - Description, markdown, in this order (drop a section only when it would be empty):
@@ -45,9 +45,9 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
 **Title:** <title>
 
 <description verbatim>`. Comment not posted → do NOT overwrite; skip to the spec.
-   3. **Write** — Linear MCP: `save_issue` (`id` = TICKET, `title`, `description`; change nothing else — not state, labels, assignee, priority). API: `issueUpdate` with `title` + `description` via the same GraphQL endpoint.
+   3. **Write** — Linear MCP: `save_issue` (`id` = TICKET, `title`, `description`; change nothing else — not state, labels, assignee, priority).
    4. Use the refined title as the ticket title from here on; hand build-plan the refined AC / out of scope as its starting draft, the Open questions as risks, and the ORIGINAL text as the verbatim ticket (§Ticket).
-3c. **Start the ticket** (new spec only; skip when the source is not Linear or the ticket's status is already started, Done or Canceled). Before the PLAN stage runs, set the Linear ticket to In Progress: Linear MCP `save_issue` (`id` = TICKET, `state` = `In Progress`; change nothing else); API: find the team's workflow state named In Progress, then `issueUpdate` with its `stateId`. Never blocks: any failure → log one line, continue.
+3c. **Start the ticket** (new spec only; skip when the source is not the Linear MCP or the ticket's status is already started, Done or Canceled). Before the PLAN stage runs, set the Linear ticket to In Progress: Linear MCP `save_issue` (`id` = TICKET, `state` = `In Progress`; change nothing else). Never blocks: any failure → log one line, continue.
 4. **Workspace alignment** — `git fetch --prune origin`; CUR = `git branch --show-current`; OWN = `git rev-list --count origin/<BASE>..HEAD`. Uncommitted changes not belonging to TICKET → stop. First matching case:
    | case | action |
    |---|---|
@@ -59,7 +59,7 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
    Base freshness: OWN == 0 and HEAD ≠ `origin/<BASE>` → `git merge --ff-only origin/<BASE>`. OWN > 0 and behind → tell build-plan to record a non-blocking risk; never rebase without asking.
    Some agent hosts (e.g. T3 Code) rename fresh worktree branches → build-review re-checks the branch name before every push.
 5. **Env**: `<runtime.python> --version` is ≥ 3.11 (else fix `runtime.python` in the config — `T` needs it); each touched area's setup / health check from its `docs/ai/commands.md` passes, else set it up per that doc.
-6. **Tools**: `gh auth status` fails → pass "REVIEW blocked: gh missing / unauthenticated" to build-plan as a non-blocking risk.
+6. **Tools**: no GitHub MCP tools (names contain `github`) and `gh auth status` fails → pass "REVIEW blocked: no GitHub MCP and gh missing / unauthenticated" to build-plan as a non-blocking risk. The CI wait and the merge watch use `gh` (see MERGE WATCH): `gh` missing → say so in the risk.
 
 ## Dispatch — repeat until a stop row
 1. `T status <TICKET>` → stage S (new ticket: S = PLAN, no spec yet — build-plan runs `T init`).
@@ -79,13 +79,13 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
 4. It returned → its return line says where the ticket went. It ended the turn on purpose (REVIEW waiting on CI) → end the turn too. Else → step 1.
 
 ## MERGE WATCH — after DONE, Linear tickets only
-Runs once the ticket is DONE (also when resumed at DONE) and the PR is open and ready: `gh pr view <pr> --json state,isDraft` → `OPEN` and not a draft. A draft PR (after `ci_red_baseline`) cannot be merged → skip and say so. PR already `MERGED` → treat as exit 0 below. Source not Linear → skip.
+Runs once the ticket is DONE (also when resumed at DONE) and the PR is open and ready: read the PR through the GitHub MCP (`gh pr view <pr> --json state,isDraft` when the MCP is unavailable) → `OPEN` and not a draft. A draft PR (after `ci_red_baseline`) cannot be merged → skip and say so. PR already `MERGED` → treat as exit 0 below. Source not Linear → skip.
 1. Print the final report first.
 2. Run `<runtime.python> .codeangel/skills/build-loop/scripts/await_merge.py <pr>` as a background command with the longest timeout your harness allows (≥ 2 h). It polls `gh pr view` every 5 min for up to 2 h and makes no model call between polls: do not poll yourself, re-invoke a skill, or sleep-loop — end the turn and wait for the command to finish. A command killed by the harness timeout counts as exit 3.
 3. On exit, one action:
    | exit | meaning | Linear status |
    |---|---|---|
-   | 0 | merged | Done: status not already Done → `save_issue` (`id` = TICKET, `state` = `Done`; API: `issueUpdate` with the team's Done `stateId`) |
+   | 0 | merged | Done: status not already Done → `save_issue` (`id` = TICKET, `state` = `Done`) |
    | 1 | closed without merging | unchanged; tell the user |
    | 2 | `gh` failed 3 polls in a row | unchanged; tell the user the error |
    | 3 | still open after 2 h | unchanged; tell the user |

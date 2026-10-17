@@ -9,9 +9,9 @@ Deletes only what is provably merged AND disposable. Any guard fails → skip th
 Config (`.codeangel/codeangel.toml`): `[worktrees] disposable` (ignored-file patterns safe to delete) and each `[[areas]] pre_remove` (commands run before removal; `{worktree}` = the worktree path).
 
 ## 1. Inputs
-- `gh auth status` fails → output `worktree-cleanup skipped: gh unavailable`, stop.
+- No GitHub MCP tools (names contain `github`) and `gh auth status` fails → output `worktree-cleanup skipped: GitHub unavailable`, stop.
 - `git fetch --prune origin`
-- PRS = `gh pr list --author @me --state merged --limit 100 --json number,url,headRefName,headRefOid`
+- PRS = the current user's merged PRs in this repo (GitHub MCP: search PRs `author:@me is:merged`, up to 100; owner / repo from `git remote get-url origin`; `gh` is the fallback). Per PR: number, url, head branch (`headRefName`), head commit sha (`headRefOid`).
 - WTS = `git worktree list --porcelain` → path, HEAD, branch, `locked`. First entry = main worktree.
 
 ## 2. Candidates

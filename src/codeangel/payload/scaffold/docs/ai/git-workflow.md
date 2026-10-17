@@ -13,7 +13,7 @@
 
 ## PRs
 - Base `{{base_branch}}`, title `<TICKET>: <title>` (trackers link on the ID). Open as draft; mark ready only when CI is green. Never merge, never force-push.
-- Needs the GitHub CLI authenticated: `gh auth status`.
+- Needs the GitHub MCP signed in (`.mcp.json` / `.cursor/mcp.json`, installed by `codeangel init`) and the GitHub CLI authenticated (`gh auth status`) for the CI wait and merge watch.
 
 ## CI — `.github/workflows/`
 | workflow | runs |

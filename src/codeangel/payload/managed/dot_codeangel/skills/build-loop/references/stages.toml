@@ -144,7 +144,7 @@ does = "Push, open / update the draft PR, wait for CI, mark ready when green."
 owner = "build-review"
 entry = [
   "latest attempt PASS",
-  "`gh auth status` ok",
+  "GitHub access ok: the GitHub MCP is available, or `gh auth status` passes",
   "current branch == frontmatter branch",
 ]
 produces = [
@@ -152,7 +152,7 @@ produces = [
   "pushed branch",
   "draft PR → frontmatter pr = URL (T3: linked to the thread)",
   "§Review: PR, 'CI runs' lines '<run id> <sha> <conclusion>', ready status",
-  "ci_green: PR marked ready (`gh pr ready`) BEFORE the exit",
+  "ci_green: PR marked ready BEFORE the exit",
 ]
 
 [[stages.REVIEW.exits]]
@@ -165,7 +165,7 @@ when = "Pushed; CI running. T3 watch_pull_request → take this exit, end turn."
 status = "ci_flaky"
 to = "REVIEW"
 checks = ["pr_recorded", "note_required", "ci_flaky_once"]
-when = "Infra / flaky failure that passes locally → `gh run rerun <id> --failed`. Once per REVIEW entry; a second = ci_red_code."
+when = "Infra / flaky failure that passes locally → rerun the failed jobs. Once per REVIEW entry; a second = ci_red_code."
 
 [[stages.REVIEW.exits]]
 status = "ci_green"

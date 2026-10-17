@@ -4,6 +4,7 @@ An agent-agnostic AI software factory you install into any repo. One command giv
 
 - **Skills** in the open [Agent Skills](https://agentskills.io/specification) format (`.codeangel/skills/`), readable by Claude Code, Cursor and Codex: a `build-loop` coordinator plus one skill per stage (`build-plan`, `build-implement`, `build-verify`, `build-review`, `build-learn`) and `worktree-cleanup`.
 - **An enforced build loop.** A state machine (`stages.toml` + `transition.py`) takes a ticket from plan to implement to verify to review to learn. It refuses illegal moves and unmet checks, and `plan` / `immediate` modes let you approve a plan before any code is written. Verification runs in an isolated subagent. For Linear tickets it also moves the ticket to In Progress when planning starts and to Done once the PR is merged (a script polls GitHub every 5 minutes for up to 2 hours; no model calls while waiting).
+- **MCP servers wired up.** `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor) declare the Linear and GitHub MCP servers, so a fresh project needs no MCP setup; sign in to each server in your editor once. build-loop reads tickets and drives pull requests through these servers, not API clients (`gh` stays for the CI wait and merge watch). A project that edits a config keeps its edit on `codeangel update`.
 - **Self-maintaining agent docs.** Small `AGENTS.md` routers per area, `docs/ai/` reference, learnings, and a doc map so docs are updated in the same PR as the code they describe — the loop refuses to pass verification otherwise.
 - **Presets** for common areas: `django-drf` (Django + Django REST Framework API) and `expo` (React Native).
 
@@ -51,7 +52,7 @@ Then fill the `TODO`s in `AGENTS.md` and `docs/ai/product.md`, and drive tickets
 
 | owner | files | change how |
 |---|---|---|
-| managed (hashes in `.codeangel/codeangel.lock.json`) | `.codeangel/skills/{build-*,worktree-cleanup}/**`, `.codeangel/sync-shims.py`, `.claude/agents/build-verifier.md`, `docs/ai/agent-docs.md` | in this repo, then `codeangel update` |
+| managed (hashes in `.codeangel/codeangel.lock.json`) | `.codeangel/skills/{build-*,worktree-cleanup}/**`, `.codeangel/sync-shims.py`, `.claude/agents/build-verifier.md`, `.mcp.json`, `.cursor/mcp.json`, `docs/ai/agent-docs.md` | in this repo, then `codeangel update` |
 | generated | `.claude/skills/*/SKILL.md` | `codeangel sync` |
 | project-owned | `AGENTS.md` files, other `docs/ai/*`, doc map, learnings, `README.md`, `.codeangel/codeangel.toml`, CI workflows | edit freely; created once, never touched again |
 

@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-8/install-default-cursor-and-cl
 branch: camerondhobbs/cam-8-install-default-cursor-and-claude-mcp-configs-into-child
 base_sha: c3b9736dcb3e3eedd1aacb078ca722b3480e9c5d
 pr:
-stage: IMPLEMENT  # managed by transition.py — see stages.toml
-last_status: planned  # exit status that entered the current stage
+stage: REVIEW  # managed by transition.py — see stages.toml
+last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T15:55Z
-updated: 2026-10-17T15:56Z
+updated: 2026-10-17T16:00Z
 ---
 
 # CAM-8: Install default Cursor and Claude MCP configs into child projects
@@ -30,11 +30,11 @@ Comments: none.
 Refined by build-loop STARTUP (Linear title and description rewritten with Summary / Context / Acceptance criteria / Out of scope / Open questions; the original is kept as a Linear comment).
 
 ## Acceptance criteria
-- [ ] AC-1: `codeangel init` installs `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor) into the child project; each is valid JSON whose `mcpServers` declare a `linear` and a `github` remote server, and neither holds a token, key or `headers` entry.
-- [ ] AC-2: `codeangel update` creates either config when it is missing and keeps both under the managed-file rules: a locally edited config is never overwritten, and the new version lands as `<file>.codeangel-new`.
-- [ ] AC-3: build-loop uses the Linear MCP for tracker reads and writes and the GitHub MCP for pull-request operations (find / create, check state, mark ready, rerun, failure logs, list merged PRs); the shipped skills, contract, spec template and `transition.py` carry no API-client path (`LINEAR_API_KEY`, `curl`, GraphQL, `issueUpdate`, the `linear-api` source).
-- [ ] AC-4: The waits that need no judgement stay on `gh` (`gh pr checks --watch`, `await_merge.py`) because an MCP call per poll costs model tokens; the skills say so, and name `gh` as the fallback when the GitHub MCP is unavailable.
-- [ ] AC-5: The docs that describe the installed layout and build-loop tooling (README.md, `AGENTS.md`, `docs/ai/agent-docs.md`, `docs/ai/repo-map.md`, `docs/ai/git-workflow.md`, their scaffold templates, and the doc maps) name the two MCP configs and the MCP-first rule.
+- [x] AC-1: `codeangel init` installs `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor) into the child project; each is valid JSON whose `mcpServers` declare a `linear` and a `github` remote server, and neither holds a token, key or `headers` entry.
+- [x] AC-2: `codeangel update` creates either config when it is missing and keeps both under the managed-file rules: a locally edited config is never overwritten, and the new version lands as `<file>.codeangel-new`.
+- [x] AC-3: build-loop uses the Linear MCP for tracker reads and writes and the GitHub MCP for pull-request operations (find / create, check state, mark ready, rerun, failure logs, list merged PRs); the shipped skills, contract, spec template and `transition.py` carry no API-client path (`LINEAR_API_KEY`, `curl`, GraphQL, `issueUpdate`, the `linear-api` source).
+- [x] AC-4: The waits that need no judgement stay on `gh` (`gh pr checks --watch`, `await_merge.py`) because an MCP call per poll costs model tokens; the skills say so, and name `gh` as the fallback when the GitHub MCP is unavailable.
+- [x] AC-5: The docs that describe the installed layout and build-loop tooling (README.md, `AGENTS.md`, `docs/ai/agent-docs.md`, `docs/ai/repo-map.md`, `docs/ai/git-workflow.md`, their scaffold templates, and the doc maps) name the two MCP configs and the MCP-first rule.
 
 ## Out of scope
 - Per-project or per-user MCP customisation (user-level `~/.cursor/mcp.json`, `claude mcp add` scopes) and MCP servers beyond Linear and GitHub.
@@ -77,7 +77,8 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 | docs/ai/repo-map.md | modify | row for `.mcp.json`, `.cursor/mcp.json` |
 | docs/ai/git-workflow.md | modify | PR prerequisite wording |
 | docs/ai/doc-map.toml | modify | the `.codeangel/*` rule also covers `.mcp.json` and `.cursor/*` |
-| tests/cli/test_mcp_configs.py | create | init installs the configs; build-loop MCP-first instructions; docs mention |
+| tests/cli/test_mcp_configs.py | create | init installs the configs; build-loop MCP-first instructions |
+| tests/cli/test_mcp_docs.py | create | docs and doc maps name the MCP configs (split out: three test classes in one file break the two-class limit) |
 | tests/cli/test_update.py | modify | update recreates a missing config and keeps an edited one |
 | tests/harness/test_payload.py | modify | the lockfile-prefix assertion also allows `.mcp.json` and `.cursor/` |
 | docs/specs/CAM-8.md | modify | this spec |
@@ -96,8 +97,8 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 | tests/cli/test_mcp_configs.py::TestBuildLoopTooling::test_review_uses_the_github_mcp_for_pull_requests | AC-3 | `build-review` SKILL names the GitHub MCP and has none of `gh pr create`, `gh pr ready`, `gh run rerun`, `gh run view`, `gh run list` |
 | tests/cli/test_mcp_configs.py::TestBuildLoopTooling::test_cleanup_lists_merged_prs_through_the_github_mcp | AC-3 | `worktree-cleanup` SKILL names the GitHub MCP and no longer calls `gh pr list` |
 | tests/cli/test_mcp_configs.py::TestBuildLoopTooling::test_blocking_waits_stay_on_gh | AC-4 | `build-review` keeps `gh pr checks` with `--watch`; `build-loop` SKILL still runs `scripts/await_merge.py`; both say why (no model call per poll) |
-| tests/cli/test_mcp_configs.py::TestDocs::test_docs_name_the_mcp_configs | AC-5 | README.md, AGENTS.md, `docs/ai/agent-docs.md`, `docs/ai/repo-map.md`, `docs/ai/git-workflow.md`, the managed `agent-docs.md` and the scaffold `repo-map.md` / `git-workflow.md` each mention `.mcp.json` or `.cursor/mcp.json` |
-| tests/cli/test_mcp_configs.py::TestDocs::test_doc_maps_flag_mcp_config_changes | AC-5 | the repo's and the scaffold's `doc-map.toml` have a rule whose `paths` include `.mcp.json` and `.cursor/*` |
+| tests/cli/test_mcp_docs.py::TestDocs::test_docs_name_the_mcp_configs | AC-5 | README.md, AGENTS.md, `docs/ai/agent-docs.md`, `docs/ai/repo-map.md`, `docs/ai/git-workflow.md`, the managed `agent-docs.md` and the scaffold `repo-map.md` / `git-workflow.md` each mention `.mcp.json` or `.cursor/mcp.json` |
+| tests/cli/test_mcp_docs.py::TestDocs::test_doc_maps_flag_mcp_config_changes | AC-5 | the repo's and the scaffold's `doc-map.toml` have a rule whose `paths` include `.mcp.json` and `.cursor/*` |
 | tests/harness/test_payload.py::TestPayload::test_repo_uses_codeangel_folder_not_agents | AC-1 | existing test, prefix list widened: every lockfile key starts with `.codeangel/`, `.claude/`, `.cursor/`, `.mcp.json` or `docs/` |
 
 ## Docs impact
@@ -133,6 +134,7 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 
 ## Plan amendments
 <!-- - <UTC time> <what changed> — <why> -->
+- 2026-10-17T16:05Z TestDocs moved from tests/cli/test_mcp_configs.py to the new tests/cli/test_mcp_docs.py (test ids updated) — `test_test_files_hold_at_most_two_test_classes` allows two classes per file
 
 ## Verify reports
 <!--
@@ -149,6 +151,21 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 - Failure excerpt / root cause / next action: <...>
 -->
 
+### Attempt 1 — PASS
+- V1 lint/format: PASS `ruff check src tests` exit 0; `ruff format --check src tests` exit 0 (70 files formatted, nothing modified); `sync-shims.py --check` exit 0; `codeangel doctor` 0 problems, 0 warnings.
+- V2 migrations: PASS skipped: this repo has no schema or migrations (baseline: none).
+- V3 full suite: PASS `uv run pytest` 87 passed, 0 failed (baseline 74 passed, 0 failed; +13 new tests); no collection errors; failures (none) within baseline (none).
+- V4 planned tests: PASS all 14 planned ids exist and pass (29 passed across test_mcp_configs, test_mcp_docs, test_update, test_payload).
+- V5 AC audit: PASS
+  - AC-1: tests/cli/test_mcp_configs.py::TestMcpConfigs::test_init_installs_both_configs; tests/cli/test_mcp_configs.py:29 (also test_claude_servers_declare_the_http_transport :36, test_configs_carry_no_credentials :39, test_configs_are_in_the_lockfile :46)
+  - AC-2: tests/cli/test_update.py::TestUpdate::test_update_recreates_a_missing_mcp_config; tests/cli/test_update.py:89 and ::test_update_keeps_an_edited_mcp_config; tests/cli/test_update.py:98 (edit kept, `.codeangel-new` holds the new version)
+  - AC-3: tests/cli/test_mcp_configs.py::TestBuildLoopTooling::test_no_shipped_build_loop_file_has_an_api_client_path; tests/cli/test_mcp_configs.py:54 (also test_contract_declares_mcp_first_tools :64, test_review_uses_the_github_mcp_for_pull_requests :73, test_cleanup_lists_merged_prs_through_the_github_mcp :86); independent grep of .codeangel, src, README, docs/ai found no LINEAR_API_KEY / curl / graphql / issueUpdate / linear-api
+  - AC-4: tests/cli/test_mcp_configs.py::TestBuildLoopTooling::test_blocking_waits_stay_on_gh; tests/cli/test_mcp_configs.py:92 (contract.md Tools section also names `gh` as fallback, :64)
+  - AC-5: tests/cli/test_mcp_docs.py::TestDocs::test_docs_name_the_mcp_configs; tests/cli/test_mcp_docs.py:29 and ::test_doc_maps_flag_mcp_config_changes; tests/cli/test_mcp_docs.py:38
+- V6 scope audit: PASS every changed or new file is in Affected files (or is the spec); no Out-of-scope item done (await_merge.py untouched, no doctor check, state machine unchanged). `.codeangel/codeangel.toml` shows modified in `git status` only by line-ending normalisation, not in `git diff --name-only <base_sha>`.
+- V7 hygiene: PASS full diff read: no debug output, commented-out code, bare TODOs, secrets or machine paths; configs carry no headers/env/args; no comments or docstrings in new tests; installed copies equal payload copies (line endings aside); `codeangel update` reports managed files up to date and leaves the tree unchanged.
+- V8 docs in sync: PASS `T docs CAM-8` docs_synced ready; README.md, AGENTS.md, docs/ai/repo-map.md, docs/ai/agent-docs.md, docs/ai/git-workflow.md and the scaffold copies and both doc maps read against the code: accurate; `unchanged` reasons (code-standards.md, learnings/tooling.md) hold.
+
 ## Review
 - PR: <url>
 - CI runs: <!-- <run id> <sha> <conclusion> -->
@@ -160,3 +177,5 @@ Refined by build-loop STARTUP (Linear title and description rewritten with Summa
 ## Log
 - 2026-10-17T15:55Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-8-install-default-cursor-and-claude-mcp-configs-into-child, base=c3b9736dcb
 - 2026-10-17T15:56Z PLAN → IMPLEMENT [planned] attempt=0/5
+- 2026-10-17T15:58Z IMPLEMENT → VERIFY [implemented] attempt=0/5
+- 2026-10-17T16:00Z VERIFY → REVIEW [pass] attempt=0/5
