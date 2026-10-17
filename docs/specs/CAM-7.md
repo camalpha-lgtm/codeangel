@@ -6,14 +6,14 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-7/automatically-update-linear-ticket-on-build-loop-progress
 branch: camerondhobbs/cam-7-automatically-update-linear-ticket-on-build-loop-progress
 base_sha: 7288c1846d631fc421e9fd741b46238b3d593852
-pr:
-stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: pass  # exit status that entered the current stage
+pr: https://github.com/camalpha-lgtm/codeangel/pull/3
+stage: DONE  # managed by transition.py — see stages.toml
+last_status: learned  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T15:27Z
-updated: 2026-10-17T15:33Z
+updated: 2026-10-17T15:34Z
 ---
 
 # CAM-7: Automatically update Linear ticket on build-loop progress
@@ -135,15 +135,19 @@ Refined by build-loop STARTUP (Linear description rewritten with Summary / Conte
 - V8 docs in sync: PASS `T docs CAM-7` docs_synced ready; README.md and docs/ai/agent-docs.md match the new skill/script behaviour; installed copies equal the payload sources (ignoring CR); doctor 0 problems
 
 ## Review
-- PR: <url>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/3
 - CI runs: <!-- <run id> <sha> <conclusion> -->
-- Ready for review: <UTC time | not marked: reason>
+  - 39045526802 954da09 success
+- Ready for review: 2026-10-17T15:50Z
 
 ## Learnings
 <!-- - <area>/docs/learnings/<file>.md or <area>/docs/ai/<file>.md: <entry added/updated/deleted> | none: <why> -->
+- docs/learnings/tooling.md: added an entry (importing a payload script in tests writes a .pyc that breaks the payload text scans; set sys.dont_write_bytecode)
 
 ## Log
 - 2026-10-17T15:27Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-7-automatically-update-linear-ticket-on-build-loop-progress, base=7288c1846d
 - 2026-10-17T15:28Z PLAN → IMPLEMENT [planned] attempt=0/5
 - 2026-10-17T15:31Z IMPLEMENT → VERIFY [implemented] attempt=0/5
 - 2026-10-17T15:33Z VERIFY → REVIEW [pass] attempt=0/5
+- 2026-10-17T15:34Z REVIEW → LEARN [ci_green] attempt=0/5
+- 2026-10-17T15:34Z LEARN → DONE [learned] attempt=0/5
