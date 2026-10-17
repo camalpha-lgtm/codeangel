@@ -6,14 +6,14 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-6/refactor-clipy-into-modular-oo-code-and-version-the-repo-for-pinning
 branch: camerondhobbs/cam-6-refactor-clipy-code-make-sure-repo-versioned
 base_sha: 4b2f760e3be33d8f9d44e1288b3252b0d4ee7d83
-pr:
+pr: https://github.com/camalpha-lgtm/codeangel/pull/1
 stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: unblocked  # exit status that entered the current stage
+last_status: waiting_ci  # exit status that entered the current stage
 attempt: 2   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-17T11:09Z
-updated: 2026-10-17T13:40Z
+updated: 2026-10-17T13:41Z
 ---
 
 # CAM-6: Refactor cli.py into modular OO code and version the repo for pinning
@@ -260,7 +260,7 @@ Refined by build-loop STARTUP (Linear title/description rewritten; original kept
 - V8 docs in sync: PASS — `docs_synced` ✓. README, `AGENTS.md`, and `docs/ai/repo-map.md` name source packages `commands`, `doctor`, `install`, `io`, `project` and test packages `cli`, `install`, `io`, `project`, `harness`, `support`. Pin command, `[codeangel] version`, doctor mismatch warning, and `vX.Y.Z` match `VersionCheck` and `AGENTS.md`. `docs/ai/code-standards.md` matches the enforced scope. `docs/ai/agent-docs.md` matches the payload copy. Unchanged reasons for git-workflow, product, and learnings hold. `codeangel doctor` on this repo: 0 problems, 0 warnings.
 
 ## Review
-- PR: <url>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/1
 - CI runs: <!-- <run id> <sha> <conclusion> -->
 - Ready for review: <UTC time | not marked: reason>
 
@@ -282,3 +282,4 @@ Refined by build-loop STARTUP (Linear title/description rewritten; original kept
 - 2026-10-17T13:29Z VERIFY → REVIEW [pass] attempt=2/5
 - 2026-10-17T13:29Z REVIEW → BLOCKED [blocked] attempt=2/5 — install the GitHub CLI (https://cli.github.com) and run gh auth login
 - 2026-10-17T13:40Z BLOCKED → REVIEW [unblocked] attempt=2/5 — gh auth login succeeded for camalpha-lgtm
+- 2026-10-17T13:41Z REVIEW → REVIEW [waiting_ci] attempt=2/5
