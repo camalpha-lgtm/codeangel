@@ -6,7 +6,7 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-16/keep-build-loop-proof-out-of-git-show-it-only-in-the-pr
 branch: camerondhobbs/cam-16-keep-build-loop-proof-out-of-git-show-it-only-in-the-pr
 base_sha: ec2cb550abcbf7d6e99b877c37c07d1d07129358
-pr:
+pr: https://github.com/camalpha-lgtm/codeangel/pull/6
 stage: REVIEW  # managed by transition.py — see stages.toml
 last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
@@ -142,7 +142,7 @@ Files should not be added to git. Just their content of proof of acceptance crit
 | AC-8 | cli | docs/specs/evidence/CAM-16/ac-8-cli.txt | installed managed files equal the payload; harness and evidence tests pass (53) |
 
 ## Review
-- PR: <url>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/6
 - CI runs: <!-- <run id> <sha> <conclusion> -->
 - Ready for review: <UTC time | not marked: reason>
 
