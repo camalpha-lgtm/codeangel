@@ -1,0 +1,25 @@
+# AC-2: each release is a fixed version a child project can pin
+# throwaway repo (copy of this worktree), two releases cut by 'python .github/scripts/bump_version.py --release'
+
+$ git log --format=%s --grep="^Release v"
+Release v0.1.2
+Release v0.1.1
+$ git tag -n1 --list "v*"
+v0.1.1          codeangel 0.1.1
+v0.1.2          codeangel 0.1.2
+$ git cat-file -t v0.1.1
+tag
+$ git show v0.1.1:src/codeangel/__init__.py
+__version__ = "0.1.1"
+$ git show v0.1.2:src/codeangel/__init__.py
+__version__ = "0.1.2"
+
+$ uv tool install git+<repo>@v0.1.1
+$ codeangel version
+codeangel 0.1.1
+[exit 0]
+$ uv tool install --force git+<repo>@v0.1.2
+[exit 0]
+$ codeangel version
+codeangel 0.1.2
+[exit 0]

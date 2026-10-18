@@ -1,0 +1,25 @@
+# AC-3: child project recorded at codeangel 0.1.1, installed CLI is 0.1.2
+
+$ codeangel version
+codeangel 0.1.2
+$ grep "^version" .codeangel/codeangel.toml
+version = "0.1.1"  # set by `codeangel init` / `codeangel update`
+$ lock "codeangel" field
+  "codeangel": "0.1.1",
+
+$ codeangel doctor | grep -i codeangel
+[warn] project at codeangel 0.1.1, CLI is 0.1.2 → `codeangel update`
+[exit 0]
+
+$ codeangel update
+shims in sync
+codeangel 0.1.2: managed files up to date
+[exit 0]
+
+$ grep "^version" .codeangel/codeangel.toml
+version = "0.1.2"  # set by `codeangel init` / `codeangel update`
+$ lock "codeangel" field
+  "codeangel": "0.1.2",
+
+$ codeangel doctor | grep -ci "project at codeangel"
+0
