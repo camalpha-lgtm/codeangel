@@ -10,7 +10,8 @@ Project settings (spec dir, doc map, ticket pattern, areas) come from .codeangel
   log    <TICKET> TEXT             log line without a stage change
   docs   <TICKET>                  docs the change must update (docs/ai/doc-map.toml) vs §Docs impact
   evidence <TICKET>                create the git-ignored evidence dir and print it
-  proof  <TICKET> [--into FILE]    render §Evidence, with each text artefact inline, as the PR's '## Proof' section
+  publish <TICKET>                 push the evidence screenshots / videos to branch evidence/<TICKET>; print its sha
+  proof  <TICKET> [--repo OWNER/REPO --sha SHA] [--into FILE]   render §Evidence as the PR's '## Proof' section
   show   [STAGE]                   print the map
 
 Exit codes: 0 ok, 1 refused (reasons printed), 2 usage error / missing spec / broken map.
@@ -20,9 +21,11 @@ from __future__ import annotations
 
 import argparse
 import fnmatch
+import os
 import re
 import subprocess
 import sys
+import tempfile
 import tomllib
 from collections.abc import Callable
 from datetime import UTC, datetime
@@ -61,6 +64,9 @@ PROOF_RE = re.compile(
 )
 EVIDENCE_KINDS = ("api", "ui", "cli", "none")
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+VIDEO_SUFFIXES = {".mp4", ".webm", ".mov"}
+MEDIA_SUFFIXES = IMAGE_SUFFIXES | VIDEO_SUFFIXES
+MEDIA_MAX_BYTES = 50 * 1024 * 1024
 TEXT_SUFFIXES = {".txt", ".md", ".json", ".log", ".http", ".html", ".xml", ".yaml", ".yml", ".csv"}
 SECRET_RE = re.compile(
     r"\b(?:sessionid|session_id|csrftoken|password|passwd|secret|api[_-]?key|access[_-]?token|refresh[_-]?token|token)\b[\"']?\s*[=:]\s*[\"']?(?!<?redacted)[A-Za-z0-9._~+/=-]{12,}",
@@ -325,10 +331,6 @@ def artefact_problems(ac: str, proof: str, ticket: str) -> list[str]:
             problems.append(f"{ac}: {item} is missing or empty")
     if not items:
         return [f"{ac}: proof cell is empty"]
-    if not problems and not any(Path(item).suffix.lower() in TEXT_SUFFIXES for item in items):
-        problems.append(
-            f"{ac}: add a text capture (.txt) to the row — the PR description shows text, not images"
-        )
     return problems
 
 
@@ -839,16 +841,120 @@ def captured_artefacts(spec: Spec) -> list[str]:
     ]
 
 
-def missing_artefacts(spec: Spec) -> list[str]:
-    return [item for item in captured_artefacts(spec) if not (ROOT / item).is_file()]
+def missing_artefacts(spec: Spec, published: bool) -> list[str]:
+    return [
+        item
+        for item in captured_artefacts(spec)
+        if not (ROOT / item).is_file()
+        and not (published and Path(item).suffix.lower() in MEDIA_SUFFIXES)
+    ]
+
+
+def evidence_branch(ticket: str) -> str:
+    return f"evidence/{ticket}"
+
+
+def git_run(*args: str, env: dict[str, str] | None = None) -> str:
+    result = subprocess.run(
+        ["git", *args],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        env=env,
+    )
+    if result.returncode != 0:
+        raise UsageError(f"git {' '.join(args)} failed: {result.stderr.strip()}")
+    return result.stdout.strip()
+
+
+def media_files(ticket: str) -> list[Path]:
+    home = evidence_dir(ticket)
+    if not home.is_dir():
+        return []
+    return sorted(
+        file for file in home.iterdir() if file.is_file() and file.suffix.lower() in MEDIA_SUFFIXES
+    )
+
+
+def evidence_branch_tip(ticket: str) -> str | None:
+    branch = evidence_branch(ticket)
+    listed = git_run("ls-remote", "origin", f"refs/heads/{branch}")
+    if not listed:
+        return None
+    tip = listed.split()[0]
+    known = subprocess.run(["git", "cat-file", "-e", tip], cwd=ROOT, capture_output=True)
+    if known.returncode != 0:
+        git_run("fetch", "-q", "origin", f"refs/heads/{branch}")
+    return tip
+
+
+def evidence_tree(ticket: str, files: list[Path]) -> str:
+    with tempfile.TemporaryDirectory() as scratch:
+        env = {**os.environ, "GIT_INDEX_FILE": str(Path(scratch) / "index")}
+        for file in files:
+            blob = git_run("hash-object", "-w", str(file))
+            git_run(
+                "update-index",
+                "--add",
+                "--cacheinfo",
+                f"100644,{blob},{ticket}/{file.name}",
+                env=env,
+            )
+        return git_run("write-tree", env=env)
+
+
+def publish_evidence(ticket: str) -> str | None:
+    files = media_files(ticket)
+    if not files:
+        return None
+    for file in files:
+        if file.stat().st_size > MEDIA_MAX_BYTES:
+            raise Refused(
+                f"{file.relative_to(ROOT).as_posix()} is {file.stat().st_size // (1024 * 1024)} MB, over the "
+                f"{MEDIA_MAX_BYTES // (1024 * 1024)} MB limit → record a shorter clip or compress it"
+            )
+    tree = evidence_tree(ticket, files)
+    parent = evidence_branch_tip(ticket)
+    identity = {
+        "GIT_AUTHOR_NAME": "codeangel",
+        "GIT_AUTHOR_EMAIL": "codeangel@users.noreply.github.com",
+        "GIT_COMMITTER_NAME": "codeangel",
+        "GIT_COMMITTER_EMAIL": "codeangel@users.noreply.github.com",
+    }
+    parents = ["-p", parent] if parent else []
+    commit = git_run(
+        "commit-tree",
+        tree,
+        *parents,
+        "-m",
+        f"{ticket}: proof media",
+        env={**os.environ, **identity},
+    )
+    git_run("push", "-q", "origin", f"{commit}:refs/heads/{evidence_branch(ticket)}")
+    return commit
+
+
+def media_url(repo: str, sha: str, ticket: str, name: str) -> str:
+    return f"https://github.com/{repo}/blob/{sha}/{ticket}/{name}?raw=true"
+
+
+def media_markdown(path: str, ticket: str, repo: str, sha: str) -> str:
+    name = Path(path).name
+    suffix = Path(path).suffix.lower()
+    video = suffix in VIDEO_SUFFIXES
+    if repo and sha:
+        url = media_url(repo, sha, ticket, name)
+        return f"[▶ {name}]({url})" if video else f"![{name}]({url})"
+    if not (ROOT / path).is_file():
+        return f"> ⚠ `{name}` is no longer available"
+    return f"`{name}` — {'video' if video else 'screenshot'} kept locally, not committed"
 
 
 def artefact_markdown(path: str) -> str:
     name = Path(path).name
     suffix = Path(path).suffix.lower()
     file = ROOT / path
-    if suffix in IMAGE_SUFFIXES:
-        return f"`{name}` — screenshot kept locally, not committed"
     if not file.is_file():
         return f"> ⚠ `{name}` is no longer available"
     if suffix not in TEXT_SUFFIXES:
@@ -883,7 +989,18 @@ def row_excerpts(ac: str, row: list[str]) -> list[str]:
     return [
         f"**{ac}** {artefact_markdown(item)}"
         for item in (part.strip() for part in proof.split(","))
-        if item
+        if item and Path(item).suffix.lower() not in MEDIA_SUFFIXES
+    ]
+
+
+def row_media(row: list[str], ticket: str, repo: str, sha: str) -> list[str]:
+    proof = row[2]
+    if reason_after(proof, "not captured:") is not None or reason_after(proof, "n/a:") is not None:
+        return []
+    return [
+        "  " + media_markdown(item, ticket, repo, sha)
+        for item in (part.strip() for part in proof.split(","))
+        if item and Path(item).suffix.lower() in MEDIA_SUFFIXES
     ]
 
 
@@ -900,23 +1017,30 @@ def is_captured(row: list[str]) -> bool:
     return len(row) > 2 and not reason_after(row[2], "not captured:")
 
 
-def render_proof(spec: Spec) -> str:
+def render_proof(spec: Spec, repo: str = "", sha: str = "") -> str:
     acs = acceptance_criteria(spec)
     rows = evidence_rows(spec)
+    ticket = spec.get("ticket")
     captured = sum(1 for ac in acs if any(r[0] == ac and is_captured(r) for r in rows))
     summary, excerpts = [], []
     for ac, rest in acs.items():
         title = short_title(rest)
         mine = [row for row in rows if row[0] == ac and len(row) > 2]
-        summary += [row_summary(ac, title, row) for row in mine] or [
-            f"- ⚠ **{ac}** — {title} — no evidence recorded"
-        ]
+        if not mine:
+            summary.append(f"- ⚠ **{ac}** — {title} — no evidence recorded")
         for row in mine:
+            summary.append(row_summary(ac, title, row))
+            summary += row_media(row, ticket, repo, sha)
             excerpts += row_excerpts(ac, row)
+    where = (
+        "screenshots and videos are on the evidence branch"
+        if repo and sha
+        else "evidence stays local"
+    )
     out = [
         PROOF_BEGIN,
         "## Proof",
-        f"{captured} of {len(acs)} criteria have captured proof (evidence stays local, not committed).",
+        f"{captured} of {len(acs)} criteria have captured proof ({where}, not part of this diff).",
         "\n".join(summary),
     ]
     if excerpts:
@@ -935,13 +1059,15 @@ def splice_proof(body: str, section: str) -> str:
 
 def cmd_proof(args: argparse.Namespace) -> None:
     _, spec = load(args.ticket)
-    section = render_proof(spec)
+    if bool(args.repo) != bool(args.sha):
+        raise UsageError("--repo and --sha go together")
+    section = render_proof(spec, args.repo or "", args.sha or "")
     if not args.into:
         print(section, end="")
         return
     target = Path(args.into)
     body = target.read_text(encoding="utf-8") if target.is_file() else ""
-    gone = missing_artefacts(spec)
+    gone = missing_artefacts(spec, bool(args.repo))
     if gone and PROOF_BEGIN in body:
         print(
             f"{args.ticket}: kept the existing Proof block in {args.into}; artefacts not found here: {', '.join(gone)}"
@@ -953,6 +1079,12 @@ def cmd_proof(args: argparse.Namespace) -> None:
 
 def cmd_evidence(args: argparse.Namespace) -> None:
     print(prepare_evidence(args.ticket).relative_to(ROOT).as_posix())
+
+
+def cmd_publish(args: argparse.Namespace) -> None:
+    sha = publish_evidence(args.ticket)
+    if sha:
+        print(sha)
 
 
 def cmd_show(args: argparse.Namespace) -> None:
@@ -980,8 +1112,7 @@ def cmd_show(args: argparse.Namespace) -> None:
         print()
 
 
-def main() -> int:
-    sys.stdout.reconfigure(encoding="utf-8")
+def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -1022,6 +1153,8 @@ def main() -> int:
 
     proof_cmd = commands.add_parser("proof")
     proof_cmd.add_argument("ticket")
+    proof_cmd.add_argument("--repo")
+    proof_cmd.add_argument("--sha")
     proof_cmd.add_argument("--into")
     proof_cmd.set_defaults(handler=cmd_proof)
 
@@ -1029,11 +1162,19 @@ def main() -> int:
     evidence.add_argument("ticket")
     evidence.set_defaults(handler=cmd_evidence)
 
+    publish = commands.add_parser("publish")
+    publish.add_argument("ticket")
+    publish.set_defaults(handler=cmd_publish)
+
     show = commands.add_parser("show")
     show.add_argument("stage", nargs="?")
     show.set_defaults(handler=cmd_show)
+    return parser
 
-    args = parser.parse_args()
+
+def main() -> int:
+    sys.stdout.reconfigure(encoding="utf-8")
+    args = build_parser().parse_args()
     try:
         validate_map()
         args.handler(args)
