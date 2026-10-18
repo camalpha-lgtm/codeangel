@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-19/show-screenshots-and-videos-
 branch: camerondhobbs/cam-19-show-screenshots-and-videos-as-proof-in-the-pr-description
 base_sha: 840c4b691bebbbfb149ab907b22d447f3d6e8e14
 pr: https://github.com/camalpha-lgtm/codeangel/pull/8
-stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: pass  # exit status that entered the current stage
+stage: DONE  # managed by transition.py — see stages.toml
+last_status: learned  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-18T09:28Z
-updated: 2026-10-18T17:19Z
+updated: 2026-10-18T17:21Z
 ---
 
 # CAM-19: Show screenshots and videos as proof in the PR description
@@ -146,14 +146,18 @@ Follow-up to CAM-16, stacked on its branch (PR #6 is open and unmerged; CAM-16 i
 
 ## Review
 - PR: https://github.com/camalpha-lgtm/codeangel/pull/8
-- CI runs: <!-- <run id> <sha> <conclusion> -->
-- Ready for review: <UTC time | not marked: reason>
+- CI runs: 39149147584 b36f950 success
+- Ready for review: 2026-10-18 (marked ready after CI green on b36f950)
 
 ## Learnings
 <!-- - <area>/docs/learnings/<file>.md or <area>/docs/ai/<file>.md: <entry added/updated/deleted> | none: <why> -->
+- docs/learnings/process.md: added the DONE-ticket follow-up route; updated the minimal-proof entry (media is published to evidence/<TICKET>)
+- docs/learnings/tooling.md: added the gh markdown rendering check and the main() statement-cap note
 
 ## Log
 - 2026-10-18T09:28Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-19-show-screenshots-and-videos-as-proof-in-the-pr-description, base=840c4b691b
 - 2026-10-18T09:29Z PLAN → IMPLEMENT [planned] attempt=0/5
 - 2026-10-18T09:33Z IMPLEMENT → VERIFY [implemented] attempt=0/5
 - 2026-10-18T17:19Z VERIFY → REVIEW [pass] attempt=0/5
+- 2026-10-18T17:21Z REVIEW → LEARN [ci_green] attempt=0/5
+- 2026-10-18T17:21Z LEARN → DONE [learned] attempt=0/5
