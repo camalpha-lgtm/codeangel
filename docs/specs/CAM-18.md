@@ -6,7 +6,7 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-18/bump-codeangel-version-automatically-in-ci-so-child-projects
 branch: camerondhobbs/cam-18-bump-codeangel-version-automatically-in-ci-so-child-projects
 base_sha: ec2cb550abcbf7d6e99b877c37c07d1d07129358
-pr:
+pr: https://github.com/camalpha-lgtm/codeangel/pull/7
 stage: REVIEW  # managed by transition.py — see stages.toml
 last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
@@ -139,7 +139,7 @@ Versions should be bumped automatically by CI instead of having just 1 version, 
 | AC-5 | none | n/a: documentation only, checked by tests/cli/test_versioning.py::TestVersioning::test_docs_describe_the_automated_release and read in V8 | README.md and AGENTS.md describe the CI bump, labels and pinning |
 
 ## Review
-- PR: <url>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/7
 - CI runs: <!-- <run id> <sha> <conclusion> -->
 - Ready for review: <UTC time | not marked: reason>
 
