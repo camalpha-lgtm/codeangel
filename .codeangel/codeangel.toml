@@ -2,7 +2,7 @@
 # Reference: docs/ai/agent-docs.md (managed by codeangel).
 
 [codeangel]
-version = "0.1.0"  # set by `codeangel init` / `codeangel update`
+version = "0.1.1"  # set by `codeangel init` / `codeangel update`
 
 [project]
 name = "codeangel"

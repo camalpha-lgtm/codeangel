@@ -1,5 +1,5 @@
 {
-  "codeangel": "0.1.0",
+  "codeangel": "0.1.1",
   "files": {
     ".claude/agents/build-verifier.md": "88cfb97adbe2504eb8b0c57b18af9d906dc19635becac3425f93b73a24545c9e",
     ".codeangel/skills/build-implement/SKILL.md": "08ec5cda857d28cd097e97f99f6e172b2201b18458c5d41282c8ab0c82286781",
