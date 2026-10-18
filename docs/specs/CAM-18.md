@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-18/bump-codeangel-version-autom
 branch: camerondhobbs/cam-18-bump-codeangel-version-automatically-in-ci-so-child-projects
 base_sha: ec2cb550abcbf7d6e99b877c37c07d1d07129358
 pr: https://github.com/camalpha-lgtm/codeangel/pull/7
-stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: pass  # exit status that entered the current stage
+stage: DONE  # managed by transition.py — see stages.toml
+last_status: learned  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-18T02:00Z
-updated: 2026-10-18T02:10Z
+updated: 2026-10-18T06:10Z
 ---
 
 # CAM-18: Bump codeangel version automatically in CI so child projects can pin and update it
@@ -140,14 +140,16 @@ Versions should be bumped automatically by CI instead of having just 1 version, 
 
 ## Review
 - PR: https://github.com/camalpha-lgtm/codeangel/pull/7
-- CI runs: <!-- <run id> <sha> <conclusion> -->
-- Ready for review: <UTC time | not marked: reason>
+- CI runs: 39089222564 2dcb710b75e99e279d89b5980f12c0a1894d73bc success (earlier push 39089204682 b8522bbc1fb8c7044132dbfd809fb99466de2dd6 success)
+- Ready for review: 2026-10-18T02:40Z
 
 ## Learnings
-<!-- - <area>/docs/learnings/<file>.md or <area>/docs/ai/<file>.md: <entry added/updated/deleted> | none: <why> -->
+- docs/learnings/tooling.md: added the `[proof: …]` tag rule (reason only for `none`)
 
 ## Log
 - 2026-10-18T02:00Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-18-bump-codeangel-version-automatically-in-ci-so-child-projects, base=ec2cb550ab
 - 2026-10-18T02:02Z PLAN → IMPLEMENT [planned] attempt=0/5
 - 2026-10-18T02:06Z IMPLEMENT → VERIFY [implemented] attempt=0/5
 - 2026-10-18T02:10Z VERIFY → REVIEW [pass] attempt=0/5
+- 2026-10-18T06:10Z REVIEW → LEARN [ci_green] attempt=0/5
+- 2026-10-18T06:10Z LEARN → DONE [learned] attempt=0/5
