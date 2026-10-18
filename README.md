@@ -69,3 +69,7 @@ The CLI lives in `src/codeangel/`, split into `commands`, `doctor`, `install`, `
 The shipped files live in `src/codeangel/payload/`: `managed/`, `scaffold/` and `presets/<name>/`. `dot_x` in a payload path installs as `.x`, and `{{name}}` in a path or file is a template variable. See `AGENTS.md`.
 
 A child project records the installed release in `[codeangel] version` inside `.codeangel/codeangel.toml`. `codeangel doctor` warns when that value disagrees with the CLI. Pin the install to a tag, as in the install block above.
+
+## Releases
+
+Versions are cut by CI, never by hand. On every merge to `main`, `.github/workflows/release.yml` bumps `codeangel.__version__` (a patch step by default; label the pull request `release:minor` or `release:major` for a bigger one), commits `Release vX.Y.Z`, tags it `vX.Y.Z` and creates a GitHub release. A child project can pin any release with `uv tool install git+https://github.com/camalpha-lgtm/codeangel@vX.Y.Z`, and `codeangel update` then brings its recorded version up to date.

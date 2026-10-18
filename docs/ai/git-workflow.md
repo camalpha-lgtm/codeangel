@@ -19,6 +19,7 @@
 | workflow | runs |
 |---|---|
 | `agents.yml` | Claude skill shims in sync with `.codeangel/skills` (`python .codeangel/sync-shims.py --check`) |
+| `release.yml` | on push to `main`: `.github/scripts/bump_version.py --release` bumps `codeangel.__version__` (patch; PR label `release:minor` / `release:major` raises it), commits `Release vX.Y.Z`, tags `vX.Y.Z`, pushes both and creates a GitHub release; skipped for `Release v` commits |
 <!-- codeangel:ci — `codeangel add` inserts a row per area workflow above this line; add other workflows by hand (the doc map flags this table when workflows change) -->
 
 ## Worktrees
