@@ -6,7 +6,7 @@ source: linear-mcp
 url: https://linear.app/cam-h-personal/issue/CAM-19/show-screenshots-and-videos-as-proof-in-the-pr-description
 branch: camerondhobbs/cam-19-show-screenshots-and-videos-as-proof-in-the-pr-description
 base_sha: 840c4b691bebbbfb149ab907b22d447f3d6e8e14
-pr:
+pr: https://github.com/camalpha-lgtm/codeangel/pull/8
 stage: REVIEW  # managed by transition.py — see stages.toml
 last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
@@ -145,7 +145,7 @@ Follow-up to CAM-16, stacked on its branch (PR #6 is open and unmerged; CAM-16 i
 | AC-8 | cli | docs/specs/evidence/CAM-19/ac-8-cli.txt | doctor reports 0 problems; installed-copy and agnostic tests pass |
 
 ## Review
-- PR: <url>
+- PR: https://github.com/camalpha-lgtm/codeangel/pull/8
 - CI runs: <!-- <run id> <sha> <conclusion> -->
 - Ready for review: <UTC time | not marked: reason>
 
