@@ -2,7 +2,7 @@
 
 <!-- When: gathering proof that a change works (build-loop VERIFY, check V9) or showing a screen by hand. cwd = {{area}}/; POSIX shell (Git Bash on Windows). -->
 
-Recipe: start → seed → auth → capture. Artefacts go to `docs/specs/evidence/<TICKET>/` at the repo root (`../docs/specs/evidence/<TICKET>/` from `{{area}}/`); name them `ac-<n>-ui.png` / `ac-<n>-cli.txt`. Never commit credentials.
+Recipe: start → seed → auth → capture. Artefacts go to `docs/specs/evidence/<TICKET>/` at the repo root (`../docs/specs/evidence/<TICKET>/` from `{{area}}/`); name them `ac-<n>-ui.png` / `ac-<n>-cli.txt` (plus `ac-<n>-ui.mp4` and a small `ac-<n>-ui.gif` preview for a flow). Create the directory with `T evidence <TICKET>` (git-ignored; build-review publishes the screenshots and videos to the branch `evidence/<TICKET>` and shows them in the PR). Never commit credentials.
 
 ## Prerequisite — a web target
 A native-only Expo app cannot be screenshotted headlessly. The web target needs `react-native-web` and `react-dom` (`npx expo install react-native-web react-dom`); until a ticket adds them, UI proof is `not captured: no web target (react-native-web / react-dom not installed)`. A device or emulator screenshot is an alternative when the harness can reach one.

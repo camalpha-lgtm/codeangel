@@ -13,7 +13,9 @@
   | `T go <TICKET> <status> [--note "…"]` | the ONLY way to change stage; REFUSED (exit 1) if illegal or checks fail → fix what it lists |
   | `T log <TICKET> "<event>"` | record an event without a stage change |
   | `T docs <TICKET>` | docs the change must update (doc map) vs `## Docs impact` — the V8 gate |
-  | `T proof <TICKET> --repo OWNER/REPO --sha SHA [--into FILE]` | render `## Evidence` as the PR's `## Proof` block (REVIEW) |
+  | `T evidence <TICKET>` | create the git-ignored evidence dir and print it (VERIFY, first) |
+  | `T publish <TICKET>` | push the evidence screenshots / videos to the branch `evidence/<TICKET>` (never the PR branch); print its sha (REVIEW) |
+  | `T proof <TICKET> [--repo OWNER/REPO --sha SHA] [--into FILE]` | render `## Evidence` as the PR's `## Proof` block: media inline from `--sha`, short text excerpts (REVIEW) |
   | `T show [STAGE]` | print the map |
   | `T init <TICKET> …` | create the spec (build-plan only) |
 - Never hand-edit frontmatter `stage` / `last_status` / `attempt` / `mode` / `blocked_*` / `updated`; never write `## Log`.
@@ -37,7 +39,7 @@ The PR that changes behaviour, structure, commands, deps, or setup also updates 
 - `codeangel init` installs both servers in `.mcp.json` (Claude Code) and `.cursor/mcp.json` (Cursor); the user signs in to each in the host.
 
 ## Evidence
-Proof that a change works, gathered at VERIFY (V9) and shown in the PR. PLAN writes each AC as user behaviour and tags it `[proof: api|ui|cli|none — reason]`. VERIFY exercises the running system once per AC and records `## Evidence` (`| AC | kind | proof | note |`), artefacts in `<project.spec_dir>/evidence/<TICKET>/` (`ac-<n>-<kind>.txt|png`). REVIEW commits them and renders `## Proof` into the PR body with `T proof`.
+Proof that a change works, gathered at VERIFY (V9) and shown in the PR. PLAN writes each AC as user behaviour and tags it `[proof: api|ui|cli|none — reason]`. VERIFY exercises the running system once per AC and records `## Evidence` (`| AC | kind | proof | note |`), artefacts in `<project.spec_dir>/evidence/<TICKET>/` (`ac-<n>-<kind>.txt|png|mp4|gif`). Artefacts are local files, never committed: `T evidence <TICKET>` creates that directory with a `.gitignore` that ignores everything in it, and `evidence_recorded` refuses a tracked artefact or an unignored directory. REVIEW runs `T publish`, which pushes the screenshots and videos to the branch `evidence/<TICKET>` (not the PR branch, not the base), then renders `## Proof` into the PR body with `T proof --repo --sha`: screenshots inline, videos as a link (GitHub strips `<video>` for repository files) with an optional `.gif` preview inline, short text excerpts in one collapsed block.
 - Each area's `docs/ai/evidence.md` holds the recipe: start · seed · auth · capture. Throwaway data only; auth is generated for the run, never a real account, never committed.
 - Credentials, session ids, tokens, and cookies appear as `<redacted>` (the `evidence_recorded` check scans the section and text artefacts for credential-looking values).
 - `not captured: <reason>` is the honest answer when the environment cannot show it; faked, edited, or reused proof is a violation.
