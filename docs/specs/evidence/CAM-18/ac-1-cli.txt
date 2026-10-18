@@ -1,0 +1,23 @@
+# AC-1: CI step 'python .github/scripts/bump_version.py --release' raises __version__ by a step
+# throwaway git repo holding src/codeangel/__init__.py (0.1.0) and the script
+
+$ grep __version__ src/codeangel/__init__.py
+__version__ = "0.1.0"
+
+$ python .github/scripts/bump_version.py --release --labels ""
+0.1.1
+[exit 0]
+$ grep __version__ src/codeangel/__init__.py
+__version__ = "0.1.1"
+
+$ python .github/scripts/bump_version.py --release --labels "bug,release:minor"
+0.2.0
+[exit 0]
+$ grep __version__ src/codeangel/__init__.py
+__version__ = "0.2.0"
+
+$ python .github/scripts/bump_version.py --release --labels "release:minor,release:major"
+1.0.0
+[exit 0]
+$ grep __version__ src/codeangel/__init__.py
+__version__ = "1.0.0"

@@ -30,7 +30,7 @@ codeangel is a Python CLI (stdlib only, Python ≥ 3.11) that installs an agent-
 Object-oriented design for all code. No single-line comments, multi-line comments, or docstrings. Detail: `docs/ai/code-standards.md`.
 
 ## Version
-`codeangel.__version__` is the version (`pyproject.toml` reads it). Release: bump that value, tag `vX.Y.Z`.
+`codeangel.__version__` is the version (`pyproject.toml` reads it). Never edit it by hand: on every merge to `main`, `.github/workflows/release.yml` runs `.github/scripts/bump_version.py --release`, which raises it by a patch step (label the PR `release:minor` or `release:major` for a bigger step), commits `Release vX.Y.Z`, tags `vX.Y.Z` and creates a GitHub release.
 
 ## Done
 Tests pass · ruff clean · standards tests pass · a preset change was exercised in a generated project (`init` → `add` → the area's own gates) · README / this file updated if commands, layout, or payload rules changed.

@@ -38,6 +38,39 @@ class TestVersioning:
         assert f'version = "{__version__}"' in config
         assert lock["codeangel"] == __version__
 
+    def test_update_moves_a_child_project_to_the_installed_version(self, project, capsys):
+        import json
+
+        config_path = project / ".codeangel/codeangel.toml"
+        lock_path = project / ".codeangel/codeangel.lock.json"
+        config_path.write_text(
+            config_path.read_text(encoding="utf-8").replace(
+                f'version = "{__version__}"', 'version = "0.0.1"', 1
+            ),
+            encoding="utf-8",
+        )
+        capsys.readouterr()
+
+        assert run(project, "doctor") == 0
+        assert f"project at codeangel 0.0.1, CLI is {__version__}" in capsys.readouterr().out
+        assert run(project, "update") == 0
+        capsys.readouterr()
+
+        assert run(project, "doctor") == 0
+        assert "project at codeangel" not in capsys.readouterr().out
+        assert f'version = "{__version__}"' in config_path.read_text(encoding="utf-8")
+        assert json.loads(lock_path.read_text(encoding="utf-8"))["codeangel"] == __version__
+
+    def test_docs_describe_the_automated_release(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        for text in (readme, agents):
+            assert "merge to `main`" in text
+            assert "release:minor" in text
+            assert "release:major" in text
+        assert "pin" in readme
+        assert "bump that value" not in agents
+
     def test_readme_documents_pinning_to_a_release_tag(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")

@@ -1,0 +1,21 @@
+# AC-4: no double release, no loop
+# throwaway repo at 1.0.0 with the target tag v1.0.1 already present
+
+$ git tag --list v1.0.1
+v1.0.1
+$ python .github/scripts/bump_version.py --release
+bump_version: tag v1.0.1 already exists
+[exit 1]
+$ grep __version__ src/codeangel/__init__.py
+__version__ = "1.0.0"
+$ git status --porcelain   (empty = clean)
+HEAD unchanged: yes
+
+# workflow guards in .github/workflows/release.yml
+$ grep -nE "branches|concurrency|group:|cancel-in-progress|head_commit|--release" .github/workflows/release.yml
+5:    branches: [main]
+10:concurrency:
+11:  group: release
+12:  cancel-in-progress: false
+16:    if: ${{ !startsWith(github.event.head_commit.message, 'Release v') }}
+43:          version=$(python .github/scripts/bump_version.py --release --labels "$LABELS")

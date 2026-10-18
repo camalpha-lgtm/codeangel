@@ -16,6 +16,7 @@
 | `.mcp.json`, `.cursor/mcp.json` | MCP servers (Linear, GitHub) for Claude Code · Cursor; installed and kept current by codeangel | `docs/ai/agent-docs.md` → Skills |
 | `.claude/skills/`, `.claude/agents/` | GENERATED Claude Code skill shims · Claude subagents | `docs/ai/agent-docs.md` → Skills |
 | `.github/workflows/` | CI | `docs/ai/git-workflow.md` |
+| `.github/scripts/` | CI helper scripts (`bump_version.py`: release version bump and tag) | `docs/ai/git-workflow.md` |
 <!-- codeangel:areas — `codeangel add <preset> <path>` inserts rows above this line -->
 
 ## Area shape (same everywhere)
