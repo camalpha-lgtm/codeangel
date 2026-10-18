@@ -72,7 +72,8 @@ AUTH_HEADER_RE = re.compile(
 )
 PROOF_BEGIN = "<!-- proof:start -->"
 PROOF_END = "<!-- proof:end -->"
-PROOF_MAX_LINES = 60
+PROOF_MAX_LINES = 10
+PROOF_TITLE_CHARS = 100
 
 
 def _commented_keys() -> set[str]:
@@ -854,12 +855,14 @@ def artefact_markdown(path: str) -> str:
         else ""
     )
     fence = fence_for(shown)
-    return f"`{name}`\n{fence}text\n{shown}{more}\n{fence}"
+    return (
+        f"<details><summary>`{name}`</summary>\n\n{fence}text\n{shown}{more}\n{fence}\n\n</details>"
+    )
 
 
 def row_markdown(row: list[str]) -> str:
     kind, proof = row[1].lower(), row[2]
-    note = f"\n_{row[3]}_" if len(row) > 3 and row[3] else ""
+    note = f" — {row[3]}" if len(row) > 3 and row[3] else ""
     missing = reason_after(proof, "not captured:")
     if missing is not None:
         return f"> ⚠ **{kind}** not captured: {missing}{note}"
@@ -867,7 +870,16 @@ def row_markdown(row: list[str]) -> str:
     if na is not None:
         return f"> n/a: {na}{note}"
     parts = [artefact_markdown(item) for item in (p.strip() for p in proof.split(",")) if item]
-    return f"**{kind}**{note}\n\n" + "\n\n".join(parts)
+    return f"{kind}{note}\n\n" + "\n\n".join(parts)
+
+
+def short_title(rest: str) -> str:
+    title = PROOF_RE.sub("", rest).lstrip(": ").strip()
+    title = re.sub(r"^\(implied\)\s*", "", title).replace("`", "").replace("<", "&lt;")
+    sentence = re.split(r"(?<=[.!?])\s", title, maxsplit=1)[0]
+    if len(sentence) <= PROOF_TITLE_CHARS:
+        return sentence
+    return sentence[: PROOF_TITLE_CHARS - 1].rsplit(" ", 1)[0].rstrip(",;:") + "…"
 
 
 def is_captured(row: list[str]) -> bool:
@@ -881,13 +893,12 @@ def render_proof(spec: Spec) -> str:
     out = [
         PROOF_BEGIN,
         "## Proof",
-        f"{captured} of {len(acs)} acceptance criteria have captured proof. Gathered by the independent verifier against the running system (check V9); the artefacts stay local and are not committed.",
+        f"{captured} of {len(acs)} criteria have captured proof (evidence stays local, not committed).",
     ]
     for ac, rest in acs.items():
-        title = PROOF_RE.sub("", rest).lstrip(": ").strip()
         mine = [row for row in rows if row[0] == ac and len(row) > 2]
         body = "\n\n".join(row_markdown(row) for row in mine) or "> ⚠ no evidence recorded"
-        out.append(f"### {ac} — {title}\n\n{body}")
+        out.append(f"**{ac} — {short_title(rest)}**\n\n{body}")
     out.append(PROOF_END)
     return "\n\n".join(out) + "\n"
 

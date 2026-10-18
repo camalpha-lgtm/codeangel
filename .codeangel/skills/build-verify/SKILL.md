@@ -42,7 +42,7 @@ A passing unit test is not evidence: V9 shows the change working as a user meets
    - `ui`: drive the screen or page to the state the AC describes (the browser tool your harness provides, or the recipe's capture command); save a text capture of the screen (visible text, URL, status; the recipe's capture command or the browser tool's snapshot) → `ac-<n>-ui.txt`; a screenshot `ac-<n>-ui.png` is optional and stays local.
    - `cli`: run the command the AC names; save command line, output, and exit code → `ac-<n>-cli.txt`.
    - `none`: no artefact; the row says `n/a: <reason>`.
-   Several kinds → one row per kind. Every captured row needs a text capture: the PR description shows text (the first 60 lines), never images. Keep text proofs short.
+   Several kinds → one row per kind. Every captured row needs a text capture: the PR description shows text, never images. Keep the proof minimal: a text artefact holds only the lines that show the behaviour (≤ 10; the PR shows the first 10 in a collapsed block) and each row's note is one short sentence.
 4. Redact credentials, session ids, tokens, and cookies as `<redacted>` in every artefact; no absolute or machine-specific paths. `evidence_recorded` scans for credential-looking values and refuses them.
 5. Stop every process you started; delete the throwaway data.
 6. Write `## Evidence`: `| AC-n | kind | <artefact paths, comma-separated> | <what it shows> |`. Cannot capture it (no browser, no device, a prerequisite the ticket does not provide) → `not captured: <specific reason>`; the PR shows it as a warning. Never invent output, edit a captured artefact, or reuse another run's. A new attempt rewrites its artefacts and rows.

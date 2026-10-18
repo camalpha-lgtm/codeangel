@@ -65,14 +65,32 @@ class TestProofRendering:
         assert "HTTP/1.1 200 OK" in section
         assert "heading: Orders" in section
         assert "```text" in section
+        assert "<details>" in section
         assert "github.com" not in section
         assert "blob" not in section
         assert "![" not in section
         assert "`ac-1-ui.png` — screenshot kept locally, not committed" in section
         assert "⚠ **cli** not captured: no export command yet" in section
-        assert "2 of 3 acceptance criteria have captured proof" in section
-        assert "### AC-1 — A user sees the order list" in section
+        assert "2 of 3 criteria have captured proof" in section
+        assert "**AC-1 — A user sees the order list**" in section
         assert "[proof:" not in section
+
+    def test_section_stays_short(self, evidence: EvidenceProject):
+        long_title = "A user opens the page and sees every order. " + "It keeps going. " * 30
+        big = evidence.artefact("ac-1-cli.txt", "".join(f"line {n}\n" for n in range(70)))
+        spec = evidence.spec(
+            [f"- [x] AC-1: {long_title} [proof: cli]"],
+            [f"| AC-1 | cli | {big} | one note |"],
+        )
+
+        section = evidence.module.render_proof(spec)
+
+        assert "line 9" in section
+        assert "line 10" not in section
+        assert "60 more lines" in section
+        assert "It keeps going. It keeps going." not in section
+        assert len(section.splitlines()) <= 30
+        assert max(len(line) for line in section.splitlines()) <= 160
 
     def test_splicing_replaces_only_the_marked_block(self, evidence: EvidenceProject):
         module = evidence.module

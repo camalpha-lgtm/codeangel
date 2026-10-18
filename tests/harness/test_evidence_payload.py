@@ -54,6 +54,15 @@ class TestEvidenceProcedure:
         assert "<!-- proof:start -->" in review
         assert "gh pr edit" in review
 
+    def test_skills_ask_for_a_minimal_proof(self):
+        verify = managed(f"{SKILLS}/build-verify/SKILL.md")
+        review = managed(f"{SKILLS}/build-review/SKILL.md")
+
+        assert "≤ 10" in verify
+        assert "one short sentence" in verify
+        assert "≤ 10 lines" in review
+        assert "one small paragraph" in review
+
     def test_worktree_cleanup_treats_evidence_as_disposable(self):
         scaffold = (PAYLOAD.scaffold.base / "dot_codeangel/codeangel.toml").read_text(
             encoding="utf-8"
