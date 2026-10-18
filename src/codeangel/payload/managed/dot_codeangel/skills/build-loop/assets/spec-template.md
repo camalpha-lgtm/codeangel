@@ -74,7 +74,7 @@ updated: <UTC ISO time>
 -->
 
 ## Evidence
-<!-- Written by VERIFY: one row per AC. kind = api | ui | cli | none. proof = comma-separated artefact paths under <spec_dir>/evidence/<TICKET>/ (git-ignored, never committed; at least one text file per row), or `not captured: <reason>`, or `n/a: <reason>` (kind none only). -->
+<!-- Written by VERIFY: one row per AC. kind = api | ui | cli | none. proof = comma-separated artefact paths under <spec_dir>/evidence/<TICKET>/ (git-ignored, never committed to the PR branch), or `not captured: <reason>`, or `n/a: <reason>` (kind none only). -->
 | AC | kind | proof | note |
 |---|---|---|---|
 | AC-1 | <api, ui, cli or none> | <docs/specs/evidence/<TICKET>/ac-1-api.txt> | <what the proof shows> |

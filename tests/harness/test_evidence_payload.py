@@ -24,7 +24,7 @@ class TestEvidenceProcedure:
             assert kind in verify
         assert "<project.spec_dir>/evidence/<TICKET>/" in verify
         assert "T evidence <TICKET>" in verify
-        assert "text capture" in verify
+        assert "text capture" not in verify
         assert "never committed" in verify
         assert "throwaway data" in verify
         assert "<redacted>" in verify
@@ -48,11 +48,20 @@ class TestEvidenceProcedure:
         commit = next(line for line in review.splitlines() if line.startswith("1. **Commit**"))
 
         assert "evidence" not in commit
-        assert "T proof <TICKET> --into" in review
-        assert "--sha" not in review
-        assert "--repo" not in review
+        assert "T proof <TICKET> --repo <REPO> --sha <SHA> --into" in review
         assert "<!-- proof:start -->" in review
         assert "gh pr edit" in review
+
+    def test_skills_describe_screenshots_videos_and_publishing(self):
+        verify = managed(f"{SKILLS}/build-verify/SKILL.md")
+        review = managed(f"{SKILLS}/build-review/SKILL.md")
+
+        assert "screenshot" in verify
+        assert "video" in verify
+        assert ".gif" in verify
+        assert "evidence/<TICKET>" in review
+        assert review.index("T publish <TICKET>") < review.index("T proof <TICKET> --repo")
+        assert "--sha <SHA>" in review
 
     def test_skills_ask_for_a_minimal_proof(self):
         verify = managed(f"{SKILLS}/build-verify/SKILL.md")

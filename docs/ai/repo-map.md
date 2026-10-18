@@ -11,7 +11,7 @@
 | `docs/ai/` | cross-cutting agent reference; `doc-map.toml` = which docs describe which code | this dir |
 | `docs/learnings/` | cross-cutting learnings + index of every area's learnings | `docs/learnings/README.md` |
 | `docs/specs/<TICKET>.md` | build-loop spec + progress log, one per ticket | `.codeangel/skills/build-loop/SKILL.md` |
-| `docs/specs/evidence/<TICKET>/` | proof the verifier captures per acceptance criterion (transcripts, screenshots); local and git-ignored, never committed; its text is shown in the PR description | `.codeangel/skills/build-verify/SKILL.md` |
+| `docs/specs/evidence/<TICKET>/` | proof the verifier captures per acceptance criterion (transcripts, screenshots); local and git-ignored, never committed to the PR branch; screenshots and videos are published to the branch `evidence/<TICKET>` and shown in the PR description | `.codeangel/skills/build-verify/SKILL.md` |
 | `.codeangel/` | `codeangel.toml` (project config) · `skills/` (canonical agent skills) · `sync-shims.py` | `docs/ai/agent-docs.md` → Skills |
 | `.mcp.json`, `.cursor/mcp.json` | MCP servers (Linear, GitHub) for Claude Code · Cursor; installed and kept current by codeangel | `docs/ai/agent-docs.md` → Skills |
 | `.claude/skills/`, `.claude/agents/` | GENERATED Claude Code skill shims · Claude subagents | `docs/ai/agent-docs.md` → Skills |
