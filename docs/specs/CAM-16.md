@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-16/keep-build-loop-proof-out-of
 branch: camerondhobbs/cam-16-keep-build-loop-proof-out-of-git-show-it-only-in-the-pr
 base_sha: ec2cb550abcbf7d6e99b877c37c07d1d07129358
 pr:
-stage: IMPLEMENT  # managed by transition.py — see stages.toml
-last_status: planned  # exit status that entered the current stage
+stage: REVIEW  # managed by transition.py — see stages.toml
+last_status: pass  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-18T01:43Z
-updated: 2026-10-18T01:45Z
+updated: 2026-10-18T01:57Z
 ---
 
 # CAM-16: Keep build-loop proof out of git; show it only in the PR description
@@ -24,14 +24,14 @@ updated: 2026-10-18T01:45Z
 Files should not be added to git. Just their content of proof of acceptance criteria should be in github description, they should not go into the file repository.
 
 ## Acceptance criteria
-- [ ] AC-1: When the verifier prepares evidence for a ticket (`T evidence <ticket>`), the evidence directory is created and git ignores everything in it, so `git status --porcelain` shows nothing for artefacts written there and `git add -A` stages none of them. [proof: cli]
-- [ ] AC-2: `T go <ticket> pass` is refused when an evidence artefact is tracked or staged in git, or the evidence directory is not git-ignored, and says how to fix it. [proof: cli]
-- [ ] AC-3: `T proof <ticket> [--into <body-file>]` renders the `## Proof` block with the content of each text artefact inline (fenced, first 60 lines), with no links to files in the repository and no `--repo` / `--sha` needed; running it again replaces only the marked block. [proof: cli]
-- [ ] AC-4: A screenshot cannot go into the PR description, so a captured proof row must include at least one text artefact; `T go <ticket> pass` is refused for an image-only row and names the AC; the Proof block marks an image as kept locally and not committed. [proof: cli]
-- [ ] AC-5: (implied) Re-running `T proof --into` where the artefacts are gone (a fresh checkout) leaves the existing Proof block in the body unchanged instead of replacing it with empty warnings. [proof: cli]
-- [ ] AC-6: The stage skills tell agents the new flow: build-verify writes artefacts via `T evidence`, a text capture per captured row, and never commits them; build-review no longer adds the evidence directory to the commit and builds the PR body from `T proof` alone. [proof: none — skill text, asserted by tests]
-- [ ] AC-7: (implied) A merged ticket's worktree can still be cleaned up: a new project's `.codeangel/codeangel.toml` lists `evidence/` among the disposable ignored files, and so does this repo's. [proof: cli]
-- [ ] AC-8: (implied) This repo's installed copy of the harness is current (`codeangel update` ran) and managed files stay project-agnostic. [proof: cli]
+- [x] AC-1: When the verifier prepares evidence for a ticket (`T evidence <ticket>`), the evidence directory is created and git ignores everything in it, so `git status --porcelain` shows nothing for artefacts written there and `git add -A` stages none of them. [proof: cli]
+- [x] AC-2: `T go <ticket> pass` is refused when an evidence artefact is tracked or staged in git, or the evidence directory is not git-ignored, and says how to fix it. [proof: cli]
+- [x] AC-3: `T proof <ticket> [--into <body-file>]` renders the `## Proof` block with the content of each text artefact inline (fenced, first 60 lines), with no links to files in the repository and no `--repo` / `--sha` needed; running it again replaces only the marked block. [proof: cli]
+- [x] AC-4: A screenshot cannot go into the PR description, so a captured proof row must include at least one text artefact; `T go <ticket> pass` is refused for an image-only row and names the AC; the Proof block marks an image as kept locally and not committed. [proof: cli]
+- [x] AC-5: (implied) Re-running `T proof --into` where the artefacts are gone (a fresh checkout) leaves the existing Proof block in the body unchanged instead of replacing it with empty warnings. [proof: cli]
+- [x] AC-6: The stage skills tell agents the new flow: build-verify writes artefacts via `T evidence`, a text capture per captured row, and never commits them; build-review no longer adds the evidence directory to the commit and builds the PR body from `T proof` alone. [proof: none — skill text, asserted by tests]
+- [x] AC-7: (implied) A merged ticket's worktree can still be cleaned up: a new project's `.codeangel/codeangel.toml` lists `evidence/` among the disposable ignored files, and so does this repo's. [proof: cli]
+- [x] AC-8: (implied) This repo's installed copy of the harness is current (`codeangel update` ran) and managed files stay project-agnostic. [proof: cli]
 
 ## Out of scope
 - Deleting or rewriting evidence already committed by CAM-13 (`docs/specs/evidence/CAM-13/`) or its spec rows.
@@ -55,22 +55,23 @@ Files should not be added to git. Just their content of proof of acceptance crit
 | src/codeangel/payload/scaffold/dot_codeangel/codeangel.toml | modify | `evidence/` in `[worktrees] disposable` |
 | .codeangel/codeangel.toml | modify | same, for this repo |
 | tests/support/evidence.py | modify | artefact helper prepares the ignored evidence dir |
-| tests/cli/test_build_loop_evidence.py | modify | AC-1, AC-2, AC-4 tests; text-capture rule |
+| tests/cli/test_build_loop_evidence.py | modify | AC-4 tests; existing rows carry a text capture |
+| tests/cli/test_build_loop_evidence_ignored.py | create | AC-1, AC-2 tests (the existing file already holds two test classes) |
 | tests/cli/test_build_loop_proof.py | modify | AC-3, AC-5 tests; inline rendering |
 | tests/harness/test_evidence_payload.py | modify | AC-6, AC-7 payload text |
-| .codeangel/ , .claude/ , docs/ai/agent-docs.md | modify | this repo's installed copy, refreshed by `codeangel update` (AC-8) |
+| .codeangel/ (incl. codeangel.lock.json), .claude/ , docs/ai/agent-docs.md | modify | this repo's installed copy, refreshed by `codeangel update` (AC-8) |
 | docs/ai/repo-map.md | modify | evidence row: local, untracked |
 | docs/specs/CAM-16.md | modify | this spec |
 
 ## Test plan
 | test id | covers | asserts |
 |---|---|---|
-| tests/cli/test_build_loop_evidence.py::TestEvidenceIgnored::test_prepare_creates_an_ignoring_dir | AC-1 | `prepare_evidence` creates the dir with a `.gitignore` of `*`; in a real git repo `git status --porcelain` and `git add -A` show no artefact |
-| tests/cli/test_build_loop_evidence.py::TestEvidenceIgnored::test_evidence_command_prints_the_dir | AC-1 | `T evidence ABC-1` exits 0 and prints the repo-relative dir |
-| tests/cli/test_build_loop_evidence.py::TestEvidenceIgnored::test_unignored_dir_is_refused | AC-2 | artefacts present but no `.gitignore` → problem naming `T evidence` |
-| tests/cli/test_build_loop_evidence.py::TestEvidenceIgnored::test_tracked_artefact_is_refused | AC-2 | an artefact added with `git add -f` → problem naming it |
-| tests/cli/test_build_loop_evidence.py::TestEvidenceRecorded::test_image_only_row_is_refused | AC-4 | a row of only a `.png` → problem naming the AC and asking for a text capture |
-| tests/cli/test_build_loop_evidence.py::TestEvidenceRecorded::test_text_plus_image_row_is_accepted | AC-4 | text + png row → no problems |
+| tests/cli/test_build_loop_evidence_ignored.py::TestEvidenceIgnored::test_prepare_creates_an_ignoring_dir | AC-1 | `prepare_evidence` creates the dir with a `.gitignore` of `*`; in a real git repo `git status --porcelain` and `git add -A` show no artefact |
+| tests/cli/test_build_loop_evidence_ignored.py::TestEvidenceIgnored::test_evidence_command_prints_the_dir | AC-1 | `T evidence ABC-1` exits 0 and prints the repo-relative dir |
+| tests/cli/test_build_loop_evidence_ignored.py::TestEvidenceIgnored::test_unignored_dir_is_refused | AC-2 | artefacts present but no `.gitignore` → problem naming `T evidence` |
+| tests/cli/test_build_loop_evidence_ignored.py::TestEvidenceIgnored::test_tracked_artefact_is_refused | AC-2 | an artefact added with `git add -f` → problem naming it |
+| tests/cli/test_build_loop_evidence.py::TestEvidenceGate::test_image_only_row_is_refused | AC-4 | a row of only a `.png` → problem naming the AC and asking for a text capture |
+| tests/cli/test_build_loop_evidence.py::TestEvidenceGate::test_text_plus_image_row_is_accepted | AC-4 | text + png row → no problems |
 | tests/cli/test_build_loop_proof.py::TestProofRendering::test_section_shows_text_inline_without_repo_links | AC-3, AC-4 | text inline in a fence, no `github.com` / `blob` link, image marked local, warnings kept |
 | tests/cli/test_build_loop_proof.py::TestProofRendering::test_splicing_replaces_only_the_marked_block | AC-3 | a second render replaces only the marked block |
 | tests/cli/test_build_loop_proof.py::TestProofRendering::test_proof_command_writes_into_a_body_file | AC-3 | `T proof ABC-1 --into FILE` (no `--repo` / `--sha`) writes the block |
@@ -104,29 +105,41 @@ Files should not be added to git. Just their content of proof of acceptance crit
 - schema drift: n/a (no schema)
 
 ## Plan amendments
-<!-- - <UTC time> <what changed> — <why> -->
+- 2026-10-18 IMPLEMENT: ignore tests moved to a new file tests/cli/test_build_loop_evidence_ignored.py and the text-capture tests stay in TestEvidenceGate — code standards allow at most two test classes per file. Test ids updated; AC unchanged.
 
 ## Verify reports
-<!--
-### Attempt 1 — PASS|FAIL
-- V1 lint/format: PASS|FAIL <detail>
-- V2 migrations: PASS|FAIL
-- V3 full suite: PASS|FAIL <n passed, m failed; failures ⊆ baseline?>
-- V4 planned tests: PASS|FAIL
-- V5 AC audit: PASS|FAIL
-  - AC-1: <test node id>; <file>:<line>
-- V6 scope audit: PASS|FAIL
-- V7 hygiene: PASS|FAIL
-- V8 docs in sync: PASS|FAIL
-- V9 evidence: PASS|FAIL <rows captured / not captured>
-- Failure excerpt / root cause / next action: <...>
--->
+### Attempt 1 — PASS
+- V1 lint/format: PASS `uv run ruff check src tests` exit 0; `ruff format --check src tests` exit 0 (75 files formatted), nothing modified
+- V2 migrations: PASS n/a, no schema in any area
+- V3 full suite: PASS `uv run pytest` 120 passed, 0 failed (baseline 111 passed, 0 failed); no failures
+- V4 planned tests: PASS all 14 Test plan ids exist and pass (14 passed in a targeted run)
+- V5 AC audit: PASS
+  - AC-1: tests/cli/test_build_loop_evidence_ignored.py::TestEvidenceIgnored::test_prepare_creates_an_ignoring_dir; tests/cli/test_build_loop_evidence_ignored.py:24 (+ test_evidence_command_prints_the_dir :36)
+  - AC-2: tests/cli/test_build_loop_evidence_ignored.py::TestEvidenceIgnored::test_unignored_dir_is_refused; tests/cli/test_build_loop_evidence_ignored.py:43 (+ test_tracked_artefact_is_refused :54)
+  - AC-3: tests/cli/test_build_loop_proof.py::TestProofRendering::test_section_shows_text_inline_without_repo_links; tests/cli/test_build_loop_proof.py:62 (+ test_splicing_replaces_only_the_marked_block :77, test_proof_command_writes_into_a_body_file :93)
+  - AC-4: tests/cli/test_build_loop_evidence.py::TestEvidenceGate::test_image_only_row_is_refused; tests/cli/test_build_loop_evidence.py:118 (+ test_text_plus_image_row_is_accepted :128; image note asserted at tests/cli/test_build_loop_proof.py:62)
+  - AC-5: tests/cli/test_build_loop_proof.py::TestProofRendering::test_missing_artefacts_keep_the_existing_block; tests/cli/test_build_loop_proof.py:106
+  - AC-6: tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_review_does_not_commit_evidence_and_renders_the_proof_section; tests/harness/test_evidence_payload.py:46 (+ test_verify_defines_v9_for_every_proof_kind :19)
+  - AC-7: tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_worktree_cleanup_treats_evidence_as_disposable; tests/harness/test_evidence_payload.py:57
+  - AC-8: tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_repo_installed_copy_is_current; tests/harness/test_evidence_payload.py:66 (all seven installed managed files also diffed identical to the payload)
+- V6 scope audit: PASS every changed file is in Affected files or is the spec; `.claude/` shims unchanged (no SKILL frontmatter change); evidence dir is git-ignored, absent from `git status`, none tracked or staged; no Out-of-scope item done (CAM-13 evidence untouched, version not bumped)
+- V7 hygiene: PASS no debug output, commented-out code, TODOs, secrets, or machine-specific paths in the diff or the artefacts; payload stays project-agnostic (standards tests pass). Non-blocking nit: tests/cli/test_build_loop_evidence.py:129-130 repeats the same `shot = evidence.artefact("ac-1-ui.png", PNG)` line (harmless duplicate; REVIEW may drop one)
+- V8 docs in sync: PASS `T docs CAM-16` docs_synced ready; docs/ai/repo-map.md and docs/ai/agent-docs.md read against the code and accurate; README.md and AGENTS.md unchanged reasons hold (no command, layout or payload-rule change)
+- V9 evidence: PASS AC-1, AC-2, AC-3, AC-4, AC-5, AC-7, AC-8 captured from a throwaway `codeangel init` project (git repo, spec DEMO-1) and this repo; AC-6 n/a (skill text). `T docs`/`evidence_recorded` preview ready.
+- Failure excerpt / root cause / next action: none. Note: `codeangel doctor` warns that `docs/ai/evidence.md` is missing for the agent-docs reference; this warning predates the ticket and is not in scope.
 
 ## Evidence
 <!-- Written by VERIFY: one row per AC. kind = api | ui | cli | none. proof = comma-separated artefact paths under <spec_dir>/evidence/<TICKET>/, or `not captured: <reason>`, or `n/a: <reason>` (kind none only). -->
 | AC | kind | proof | note |
 |---|---|---|---|
-| AC-1 | <api, ui, cli or none> | <docs/specs/evidence/<TICKET>/ac-1-api.txt> | <what the proof shows> |
+| AC-1 | cli | docs/specs/evidence/CAM-16/ac-1-cli.txt | `T evidence` prints the dir and creates `.gitignore` of `*`; with a text and a png artefact written, `git status --porcelain` and `git add -A` stage nothing |
+| AC-2 | cli | docs/specs/evidence/CAM-16/ac-2-cli.txt | `T go pass` refused with a fix hint when the dir is not ignored and when an artefact is force-added; ready once fixed |
+| AC-3 | cli | docs/specs/evidence/CAM-16/ac-3-cli.txt | `T proof --into` with no `--repo` / `--sha` writes fenced inline text (70-line file cut at 60), no repository links; a second run replaces only the marked block |
+| AC-4 | cli | docs/specs/evidence/CAM-16/ac-4-cli.txt | image-only row refused naming AC-2; with a text capture the exit is ready and the Proof block marks the png as kept locally |
+| AC-5 | cli | docs/specs/evidence/CAM-16/ac-5-cli.txt | with the artefacts gone, `T proof --into` keeps the existing block (body identical); with no block yet it renders the unavailable warning |
+| AC-6 | none | n/a: skill text, asserted by tests | covered by the harness tests in V5 |
+| AC-7 | cli | docs/specs/evidence/CAM-16/ac-7-cli.txt | `evidence/` is in the disposable list of this repo and of a freshly initialised project |
+| AC-8 | cli | docs/specs/evidence/CAM-16/ac-8-cli.txt | installed managed files equal the payload; harness and evidence tests pass (53) |
 
 ## Review
 - PR: <url>
@@ -139,3 +152,5 @@ Files should not be added to git. Just their content of proof of acceptance crit
 ## Log
 - 2026-10-18T01:43Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-16-keep-build-loop-proof-out-of-git-show-it-only-in-the-pr, base=ec2cb550ab
 - 2026-10-18T01:45Z PLAN → IMPLEMENT [planned] attempt=0/5
+- 2026-10-18T01:51Z IMPLEMENT → VERIFY [implemented] attempt=0/5
+- 2026-10-18T01:57Z VERIFY → REVIEW [pass] attempt=0/5

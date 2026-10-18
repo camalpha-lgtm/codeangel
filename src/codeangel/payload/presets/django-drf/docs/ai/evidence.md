@@ -2,7 +2,7 @@
 
 <!-- When: gathering proof that a change works (build-loop VERIFY, check V9) or running the API by hand to show a behaviour. cwd = {{area}}/; POSIX shell (Git Bash on Windows). -->
 
-Recipe: start → seed → auth → capture. Artefacts go to `docs/specs/evidence/<TICKET>/` at the repo root (`../docs/specs/evidence/<TICKET>/` from `{{area}}/`); name them `ac-<n>-api.txt` / `ac-<n>-ui.png`. Never commit credentials.
+Recipe: start → seed → auth → capture. Artefacts go to `docs/specs/evidence/<TICKET>/` at the repo root (`../docs/specs/evidence/<TICKET>/` from `{{area}}/`); name them `ac-<n>-api.txt` / `ac-<n>-ui.txt` / `ac-<n>-ui.png`. Create the directory with `T evidence <TICKET>` (git-ignored; artefacts are never committed, the PR description shows the text ones). A UI row needs the `.txt` (the visible text, URL and status of the page); the `.png` is optional and stays local. Never commit credentials.
 
 ## 1. Start on throwaway data
 | step | command |

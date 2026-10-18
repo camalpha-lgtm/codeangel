@@ -21,7 +21,7 @@ python = "uv run python"  # Python >= 3.11 that runs .codeangel scripts (Windows
 # Ignored files worktree-cleanup may delete with a merged worktree. Anything else blocks removal.
 disposable = [
   ".venv/", "venv/", "__pycache__/", ".pytest_cache/", ".ruff_cache/", ".mypy_cache/",
-  "node_modules/", ".expo/", "dist/", "build/", "*.pyc", "*.sqlite3", ".coverage", "htmlcov/",
+  "node_modules/", ".expo/", "dist/", "build/", "*.pyc", "*.sqlite3", ".coverage", "htmlcov/", "evidence/",
 ]
 
 # Areas — `codeangel add <preset> <path>` appends one [[areas]] block per area.

@@ -8,6 +8,7 @@ from support import run
 from codeangel.install.tree import PAYLOAD
 
 SKILLS = "dot_codeangel/skills"
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def managed(relative: str) -> str:
@@ -22,6 +23,9 @@ class TestEvidenceProcedure:
         for kind in ("`api`", "`ui`", "`cli`", "`none`"):
             assert kind in verify
         assert "<project.spec_dir>/evidence/<TICKET>/" in verify
+        assert "T evidence <TICKET>" in verify
+        assert "text capture" in verify
+        assert "never committed" in verify
         assert "throwaway data" in verify
         assert "<redacted>" in verify
         assert "not captured:" in verify
@@ -39,14 +43,35 @@ class TestEvidenceProcedure:
         assert "user behaviour" in plan
         assert "[proof: api|ui|cli|none — reason]" in plan
 
-    def test_review_commits_evidence_and_renders_the_proof_section(self):
+    def test_review_does_not_commit_evidence_and_renders_the_proof_section(self):
         review = managed(f"{SKILLS}/build-review/SKILL.md")
+        commit = next(line for line in review.splitlines() if line.startswith("1. **Commit**"))
 
-        assert "<project.spec_dir>/evidence/<TICKET>/" in review
-        assert "T proof <TICKET> --repo" in review
-        assert "--sha <PUSHED_SHA>" in review
+        assert "evidence" not in commit
+        assert "T proof <TICKET> --into" in review
+        assert "--sha" not in review
+        assert "--repo" not in review
         assert "<!-- proof:start -->" in review
         assert "gh pr edit" in review
+
+    def test_worktree_cleanup_treats_evidence_as_disposable(self):
+        scaffold = (PAYLOAD.scaffold.base / "dot_codeangel/codeangel.toml").read_text(
+            encoding="utf-8"
+        )
+        own = (ROOT / ".codeangel/codeangel.toml").read_text(encoding="utf-8")
+
+        assert '"evidence/"' in scaffold
+        assert '"evidence/"' in own
+
+    def test_repo_installed_copy_is_current(self):
+        for relative in (
+            "skills/build-loop/scripts/transition.py",
+            "skills/build-loop/references/contract.md",
+            "skills/build-verify/SKILL.md",
+            "skills/build-review/SKILL.md",
+        ):
+            installed = (ROOT / ".codeangel" / relative).read_text(encoding="utf-8")
+            assert installed == managed(f"dot_codeangel/{relative}"), relative
 
     def test_state_machine_and_template_carry_the_evidence_flow(self):
         stages = managed(f"{SKILLS}/build-loop/references/stages.toml")

@@ -70,7 +70,7 @@ class TestEvidenceGate:
         assert evidence.problems(spec) == ["AC-2 has no row in §Evidence"]
 
     def test_proof_file_not_captured_and_n_a_rows_pass(self, evidence: EvidenceProject):
-        shot = evidence.artefact("ac-1-ui.png", PNG)
+        shot = evidence.artefact("ac-1-ui.txt", "heading: Orders\nrows: 3\n")
         spec = evidence.spec(
             [
                 "- [x] AC-1: a [proof: ui]",
@@ -115,8 +115,26 @@ class TestEvidenceGate:
 
         assert evidence.problems(spec)
 
-    def test_every_planned_kind_needs_a_row(self, evidence: EvidenceProject):
+    def test_image_only_row_is_refused(self, evidence: EvidenceProject):
         shot = evidence.artefact("ac-1-ui.png", PNG)
+        spec = evidence.spec(["- [x] AC-1: a [proof: ui]"], [f"| AC-1 | ui | {shot} | x |"])
+
+        problems = evidence.problems(spec)
+
+        assert len(problems) == 1
+        assert "AC-1" in problems[0]
+        assert "text capture" in problems[0]
+
+    def test_text_plus_image_row_is_accepted(self, evidence: EvidenceProject):
+        shot = evidence.artefact("ac-1-ui.png", PNG)
+        shot = evidence.artefact("ac-1-ui.png", PNG)
+        text = evidence.artefact("ac-1-ui.txt", "heading: Orders\n")
+        spec = evidence.spec(["- [x] AC-1: a [proof: ui]"], [f"| AC-1 | ui | {shot}, {text} | x |"])
+
+        assert evidence.problems(spec) == []
+
+    def test_every_planned_kind_needs_a_row(self, evidence: EvidenceProject):
+        shot = evidence.artefact("ac-1-ui.txt", "heading: Orders\n")
         spec = evidence.spec(
             ["- [x] AC-1: a [proof: ui+api]"],
             [f"| AC-1 | ui | {shot} | x |"],

@@ -9,7 +9,8 @@ Project settings (spec dir, doc map, ticket pattern, areas) come from .codeangel
   go     <TICKET> <exit-status> [--note TEXT]
   log    <TICKET> TEXT             log line without a stage change
   docs   <TICKET>                  docs the change must update (docs/ai/doc-map.toml) vs §Docs impact
-  proof  <TICKET> --repo OWNER/REPO --sha SHA [--into FILE]   render §Evidence as the PR's '## Proof' section
+  evidence <TICKET>                create the git-ignored evidence dir and print it
+  proof  <TICKET> [--into FILE]    render §Evidence, with each text artefact inline, as the PR's '## Proof' section
   show   [STAGE]                   print the map
 
 Exit codes: 0 ok, 1 refused (reasons printed), 2 usage error / missing spec / broken map.
@@ -256,6 +257,49 @@ def evidence_dir(ticket: str) -> Path:
     return SPEC_DIR / "evidence" / ticket
 
 
+def prepare_evidence(ticket: str) -> Path:
+    home = evidence_dir(ticket)
+    home.mkdir(parents=True, exist_ok=True)
+    marker = home / ".gitignore"
+    if not marker.is_file():
+        marker.write_text("*\n", encoding="utf-8", newline="\n")
+    return home
+
+
+def tracked_evidence(ticket: str) -> list[str]:
+    result = subprocess.run(
+        [
+            "git",
+            "-c",
+            "core.quotepath=off",
+            "ls-files",
+            "--",
+            evidence_dir(ticket).relative_to(ROOT).as_posix(),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    return [line for line in result.stdout.splitlines() if line] if result.returncode == 0 else []
+
+
+def evidence_tracking_problems(ticket: str) -> list[str]:
+    home = evidence_dir(ticket)
+    if not home.is_dir():
+        return []
+    where = home.relative_to(ROOT).as_posix()
+    marker = home / ".gitignore"
+    problems = []
+    if not marker.is_file() or marker.read_text(encoding="utf-8").strip() != "*":
+        problems.append(f"{where}/ is not git-ignored → run `T evidence {ticket}`")
+    problems += [
+        f"{path} is tracked by git → `git rm --cached -r {where}`; evidence is shown in the PR, never committed"
+        for path in tracked_evidence(ticket)
+    ]
+    return problems
+
+
 def reason_after(proof: str, prefix: str) -> str | None:
     if proof.lower().startswith(prefix):
         return proof[len(prefix) :].strip()
@@ -265,13 +309,20 @@ def reason_after(proof: str, prefix: str) -> str | None:
 def artefact_problems(ac: str, proof: str, ticket: str) -> list[str]:
     home = evidence_dir(ticket).resolve()
     problems = []
-    for item in filter(None, (part.strip() for part in proof.split(","))):
+    items = list(filter(None, (part.strip() for part in proof.split(","))))
+    for item in items:
         file = (ROOT / item).resolve()
         if home not in file.parents:
             problems.append(f"{ac}: {item} is not under {home.relative_to(ROOT).as_posix()}/")
         elif not file.is_file() or file.stat().st_size == 0:
             problems.append(f"{ac}: {item} is missing or empty")
-    return problems or ([] if proof.strip() else [f"{ac}: proof cell is empty"])
+    if not items:
+        return [f"{ac}: proof cell is empty"]
+    if not problems and not any(Path(item).suffix.lower() in TEXT_SUFFIXES for item in items):
+        problems.append(
+            f"{ac}: add a text capture (.txt) to the row — the PR description shows text, not images"
+        )
+    return problems
 
 
 def evidence_row_problems(row: list[str], acs: dict[str, str], ticket: str) -> list[str]:
@@ -341,7 +392,12 @@ def check_evidence_recorded(spec: Spec, note: str) -> list[str]:
     rows = evidence_rows(spec)
     ticket = spec.get("ticket")
     problems = [p for row in rows for p in evidence_row_problems(row, acs, ticket)]
-    return problems + missing_kind_problems(rows, acs) + evidence_secret_problems(spec, ticket)
+    return (
+        problems
+        + missing_kind_problems(rows, acs)
+        + evidence_secret_problems(spec, ticket)
+        + evidence_tracking_problems(ticket)
+    )
 
 
 def check_planned_tests_exist(spec: Spec, note: str) -> list[str]:
@@ -766,27 +822,43 @@ def fence_for(text: str) -> str:
     return "````" if "```" in text else "```"
 
 
-def artefact_markdown(ac: str, path: str, repo: str, sha: str) -> str:
-    url = f"https://github.com/{repo}/blob/{sha}/{path}"
+def captured_artefacts(spec: Spec) -> list[str]:
+    return [
+        item
+        for row in evidence_rows(spec)
+        if len(row) > 2 and is_captured(row) and not reason_after(row[2], "n/a:")
+        for item in (part.strip() for part in row[2].split(","))
+        if item
+    ]
+
+
+def missing_artefacts(spec: Spec) -> list[str]:
+    return [item for item in captured_artefacts(spec) if not (ROOT / item).is_file()]
+
+
+def artefact_markdown(path: str) -> str:
+    name = Path(path).name
     suffix = Path(path).suffix.lower()
-    if suffix in IMAGE_SUFFIXES:
-        return f"![{ac} {Path(path).name}]({url}?raw=true)"
     file = ROOT / path
-    if suffix in TEXT_SUFFIXES and file.is_file():
-        lines = file.read_text(encoding="utf-8", errors="ignore").splitlines()
-        shown = "\n".join(lines[:PROOF_MAX_LINES])
-        more = (
-            f"\n… {len(lines) - PROOF_MAX_LINES} more lines in the file"
-            if len(lines) > PROOF_MAX_LINES
-            else ""
-        )
-        fence = fence_for(shown)
-        return f"`{path}`\n{fence}text\n{shown}{more}\n{fence}"
-    return f"[{path}]({url})"
+    if suffix in IMAGE_SUFFIXES:
+        return f"`{name}` — screenshot kept locally, not committed"
+    if not file.is_file():
+        return f"> ⚠ `{name}` is no longer available"
+    if suffix not in TEXT_SUFFIXES:
+        return f"`{name}` — kept locally, not committed"
+    lines = file.read_text(encoding="utf-8", errors="ignore").splitlines()
+    shown = "\n".join(lines[:PROOF_MAX_LINES])
+    more = (
+        f"\n… {len(lines) - PROOF_MAX_LINES} more lines in the local file"
+        if len(lines) > PROOF_MAX_LINES
+        else ""
+    )
+    fence = fence_for(shown)
+    return f"`{name}`\n{fence}text\n{shown}{more}\n{fence}"
 
 
-def row_markdown(row: list[str], repo: str, sha: str) -> str:
-    ac, kind, proof = row[0], row[1].lower(), row[2]
+def row_markdown(row: list[str]) -> str:
+    kind, proof = row[1].lower(), row[2]
     note = f"\n_{row[3]}_" if len(row) > 3 and row[3] else ""
     missing = reason_after(proof, "not captured:")
     if missing is not None:
@@ -794,11 +866,7 @@ def row_markdown(row: list[str], repo: str, sha: str) -> str:
     na = reason_after(proof, "n/a:")
     if na is not None:
         return f"> n/a: {na}{note}"
-    parts = [
-        artefact_markdown(ac, item, repo, sha)
-        for item in (p.strip() for p in proof.split(","))
-        if item
-    ]
+    parts = [artefact_markdown(item) for item in (p.strip() for p in proof.split(",")) if item]
     return f"**{kind}**{note}\n\n" + "\n\n".join(parts)
 
 
@@ -806,21 +874,19 @@ def is_captured(row: list[str]) -> bool:
     return len(row) > 2 and not reason_after(row[2], "not captured:")
 
 
-def render_proof(spec: Spec, repo: str, sha: str) -> str:
+def render_proof(spec: Spec) -> str:
     acs = acceptance_criteria(spec)
     rows = evidence_rows(spec)
     captured = sum(1 for ac in acs if any(r[0] == ac and is_captured(r) for r in rows))
     out = [
         PROOF_BEGIN,
         "## Proof",
-        f"{captured} of {len(acs)} acceptance criteria have captured proof. Gathered by the independent verifier against the running system (check V9); artefacts: `{evidence_dir(spec.get('ticket')).relative_to(ROOT).as_posix()}/`.",
+        f"{captured} of {len(acs)} acceptance criteria have captured proof. Gathered by the independent verifier against the running system (check V9); the artefacts stay local and are not committed.",
     ]
     for ac, rest in acs.items():
         title = PROOF_RE.sub("", rest).lstrip(": ").strip()
         mine = [row for row in rows if row[0] == ac and len(row) > 2]
-        body = (
-            "\n\n".join(row_markdown(row, repo, sha) for row in mine) or "> ⚠ no evidence recorded"
-        )
+        body = "\n\n".join(row_markdown(row) for row in mine) or "> ⚠ no evidence recorded"
         out.append(f"### {ac} — {title}\n\n{body}")
     out.append(PROOF_END)
     return "\n\n".join(out) + "\n"
@@ -835,14 +901,24 @@ def splice_proof(body: str, section: str) -> str:
 
 def cmd_proof(args: argparse.Namespace) -> None:
     _, spec = load(args.ticket)
-    section = render_proof(spec, args.repo, args.sha)
+    section = render_proof(spec)
     if not args.into:
         print(section, end="")
         return
     target = Path(args.into)
     body = target.read_text(encoding="utf-8") if target.is_file() else ""
+    gone = missing_artefacts(spec)
+    if gone and PROOF_BEGIN in body:
+        print(
+            f"{args.ticket}: kept the existing Proof block in {args.into}; artefacts not found here: {', '.join(gone)}"
+        )
+        return
     target.write_text(splice_proof(body, section), encoding="utf-8", newline="\n")
     print(f"{args.ticket}: proof section written to {args.into}")
+
+
+def cmd_evidence(args: argparse.Namespace) -> None:
+    print(prepare_evidence(args.ticket).relative_to(ROOT).as_posix())
 
 
 def cmd_show(args: argparse.Namespace) -> None:
@@ -912,10 +988,12 @@ def main() -> int:
 
     proof_cmd = commands.add_parser("proof")
     proof_cmd.add_argument("ticket")
-    proof_cmd.add_argument("--repo", required=True)
-    proof_cmd.add_argument("--sha", required=True)
     proof_cmd.add_argument("--into")
     proof_cmd.set_defaults(handler=cmd_proof)
+
+    evidence = commands.add_parser("evidence")
+    evidence.add_argument("ticket")
+    evidence.set_defaults(handler=cmd_evidence)
 
     show = commands.add_parser("show")
     show.add_argument("stage", nargs="?")
