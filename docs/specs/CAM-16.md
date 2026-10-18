@@ -9,11 +9,11 @@ base_sha: ec2cb550abcbf7d6e99b877c37c07d1d07129358
 pr: https://github.com/camalpha-lgtm/codeangel/pull/6
 stage: REVIEW  # managed by transition.py — see stages.toml
 last_status: pass  # exit status that entered the current stage
-attempt: 1   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
+attempt: 2   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-18T01:43Z
-updated: 2026-10-18T02:06Z
+updated: 2026-10-18T06:13Z
 ---
 
 # CAM-16: Keep build-loop proof out of git; show it only in the PR description
@@ -32,7 +32,7 @@ Files should not be added to git. Just their content of proof of acceptance crit
 - [x] AC-6: The stage skills tell agents the new flow: build-verify writes artefacts via `T evidence`, a text capture per captured row, and never commits them; build-review no longer adds the evidence directory to the commit and builds the PR body from `T proof` alone. [proof: none — skill text, asserted by tests]
 - [x] AC-7: (implied) A merged ticket's worktree can still be cleaned up: a new project's `.codeangel/codeangel.toml` lists `evidence/` among the disposable ignored files, and so does this repo's. [proof: cli]
 - [x] AC-8: (implied) This repo's installed copy of the harness is current (`codeangel update` ran) and managed files stay project-agnostic. [proof: cli]
-- [x] AC-9: (user feedback) The `## Proof` block in the PR is minimal: per AC one bold line with a one-sentence title, the row note, and each text artefact as a collapsed excerpt of at most 10 lines; the verify and review skills ask for equally short notes and PR bodies. [proof: cli]
+- [x] AC-9: (user feedback) The `## Proof` block in the PR is minimal: one summary line per AC (one-sentence title + the row note) and every text artefact as an excerpt of at most 6 lines inside a single collapsed block; the verify and review skills ask for equally short notes and PR bodies. [proof: cli]
 
 ## Out of scope
 - Deleting or rewriting evidence already committed by CAM-13 (`docs/specs/evidence/CAM-13/`) or its spec rows.
@@ -81,8 +81,9 @@ Files should not be added to git. Just their content of proof of acceptance crit
 | tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_review_does_not_commit_evidence_and_renders_the_proof_section | AC-6 | review text: `T proof <TICKET> --into`, no evidence path in the commit step, no `--sha` |
 | tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_worktree_cleanup_treats_evidence_as_disposable | AC-7 | the scaffold toml and this repo's toml list `evidence/` |
 | tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_repo_installed_copy_is_current | AC-8 | this repo's `.codeangel/` copies of transition.py, the build-verify / build-review skills and contract.md equal the payload |
-| tests/cli/test_build_loop_proof.py::TestProofRendering::test_section_stays_short | AC-9 | a 70-line artefact shows 10 lines in a `<details>` block, a long AC title is cut to its first sentence, the whole one-AC section ≤ 30 lines |
-| tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_skills_ask_for_a_minimal_proof | AC-9 | build-verify and build-review texts ask for ≤ 10 lines and short notes / bodies |
+| tests/cli/test_build_loop_proof.py::TestProofRendering::test_section_stays_short | AC-9 | a 70-line artefact shows 6 lines inside one `<details>` block, a long AC title is cut to its first sentence, the whole one-AC section ≤ 24 lines with the summary above the block |
+| tests/cli/test_build_loop_proof.py::TestProofRendering::test_note_keeps_its_leading_backtick | AC-9 | a row note starting with a backtick renders intact in the summary line |
+| tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_skills_ask_for_a_minimal_proof | AC-9 | build-verify and build-review texts ask for ≤ 6 lines and short notes / bodies |
 
 ## Docs impact
 <!-- `T docs <TICKET>` lists docs mapped from the change (docs/ai/doc-map.toml). One row per doc; status updated or unchanged; unchanged needs a reason. Nothing maps → "- none: <why>". -->
@@ -110,6 +111,7 @@ Files should not be added to git. Just their content of proof of acceptance crit
 ## Plan amendments
 - 2026-10-18 IMPLEMENT: ignore tests moved to a new file tests/cli/test_build_loop_evidence_ignored.py and the text-capture tests stay in TestEvidenceGate — code standards allow at most two test classes per file. Test ids updated; AC unchanged.
 - 2026-10-18 REVIEW: user asked for a much shorter PR proof (screenshots / video welcome, text minimal) → added AC-9 and re-entered IMPLEMENT via ci_red_code. Screenshots stay unembeddable without committing a file, so they remain a local note.
+- 2026-10-18 REVIEW: first minimal version was still ~165 lines for 9 ACs → one summary line per AC, one collapsed block, 6-line cap (re-entered IMPLEMENT via ci_red_code); also stop stripping backticks from the note cell.
 
 ## Verify reports
 ### Attempt 1 — PASS
@@ -147,6 +149,20 @@ Files should not be added to git. Just their content of proof of acceptance crit
 - V9 evidence: PASS AC-1..AC-5, AC-7..AC-9 re-captured in this attempt from a throwaway `codeangel init` git project (spec DEMO-1, forced to VERIFY to read the real gate output) and this repo; each artefact <= 10 lines; AC-6 n/a (skill text). The throwaway project was deleted.
 - Failure excerpt / root cause / next action: none.
 
+### Attempt 3 — PASS
+- V1 lint/format: PASS `uv run ruff check src tests` exit 0; `ruff format --check src tests` exit 0 (75 files formatted), nothing modified
+- V2 migrations: PASS n/a, no schema in any area
+- V3 full suite: PASS `uv run pytest` 123 passed, 0 failed (baseline 111 passed, 0 failed); no failures
+- V4 planned tests: PASS all 17 Test plan ids exist and pass (36 passed in a targeted run of the four test files)
+- V5 AC audit: PASS
+  - AC-1 to AC-8: unchanged since Attempt 2 apart from the proof renderer; evidence lines as in Attempt 1 (tests re-run in the full suite); AC-3's "first 60 lines" is superseded by AC-9 (6 lines)
+  - AC-9: tests/cli/test_build_loop_proof.py::TestProofRendering::test_section_stays_short; tests/cli/test_build_loop_proof.py:82 (asserts 6 lines kept, `64 more lines`, long title cut, section <= 24 lines, `<details>` within the first 8 lines) (+ test_section_shows_text_inline_without_repo_links :62 asserts one `<details>` and the per-AC summary lines; test_note_keeps_its_leading_backtick :100; tests/harness/test_evidence_payload.py::TestEvidenceProcedure::test_skills_ask_for_a_minimal_proof :57)
+- V6 scope audit: PASS changed files are all in Affected files or the spec; installed copies in `.codeangel/` equal the payload (ignoring CR), shims in sync; evidence dir git-ignored, none of CAM-16 tracked or staged; no Out-of-scope item done
+- V7 hygiene: PASS no debug output, commented-out code, TODOs, secrets, or machine-specific paths in the diff or the artefacts; no comments or docstrings added
+- V8 docs in sync: PASS `T docs CAM-16` docs_synced ready; docs/ai/repo-map.md and agent-docs.md still accurate (the AC-9 change alters PR rendering only); unchanged reasons hold
+- V9 evidence: PASS AC-1..AC-5, AC-7..AC-9 re-captured in this attempt from a throwaway `codeangel init` git project (spec DEMO-1, moved to VERIFY there to read the real gate output) and this repo; each artefact <= 5 lines; AC-6 n/a (skill text). The throwaway project was deleted.
+- Failure excerpt / root cause / next action: none.
+
 ## Evidence
 <!-- Written by VERIFY: one row per AC. kind = api | ui | cli | none. proof = comma-separated artefact paths under <spec_dir>/evidence/<TICKET>/, or `not captured: <reason>`, or `n/a: <reason>` (kind none only). -->
 | AC | kind | proof | note |
@@ -159,7 +175,7 @@ Files should not be added to git. Just their content of proof of acceptance crit
 | AC-6 | none | n/a: skill text, asserted by tests | covered by the harness tests in V5 |
 | AC-7 | cli | docs/specs/evidence/CAM-16/ac-7-cli.txt | `evidence/` is disposable in this repo and in a fresh `init` project. |
 | AC-8 | cli | docs/specs/evidence/CAM-16/ac-8-cli.txt | Installed harness files equal the payload; tests pass and shims are in sync. |
-| AC-9 | cli | docs/specs/evidence/CAM-16/ac-9-cli.txt | A 70-line artefact shows 10 lines collapsed, the long AC title is cut, the body is 45 lines for two ACs. |
+| AC-9 | cli | docs/specs/evidence/CAM-16/ac-9-cli.txt | A 70-line artefact shows 6 lines in one collapsed block; the long AC title is cut. |
 
 ## Review
 - PR: https://github.com/camalpha-lgtm/codeangel/pull/6
@@ -178,3 +194,6 @@ Files should not be added to git. Just their content of proof of acceptance crit
 - 2026-10-18T01:58Z REVIEW → IMPLEMENT [ci_red_code] attempt=1/5 — user feedback: PR proof must be minimal (short per-AC line, collapsed capped excerpt), not long transcripts
 - 2026-10-18T02:01Z IMPLEMENT → VERIFY [implemented] attempt=1/5
 - 2026-10-18T02:06Z VERIFY → REVIEW [pass] attempt=1/5
+- 2026-10-18T02:07Z REVIEW → IMPLEMENT [ci_red_code] attempt=2/5 — user feedback: PR proof still too long — one line per AC, all excerpts in one collapsed block, 6-line cap
+- 2026-10-18T02:09Z IMPLEMENT → VERIFY [implemented] attempt=2/5
+- 2026-10-18T06:13Z VERIFY → REVIEW [pass] attempt=2/5

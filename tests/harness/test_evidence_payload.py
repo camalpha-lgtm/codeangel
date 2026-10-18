@@ -58,9 +58,9 @@ class TestEvidenceProcedure:
         verify = managed(f"{SKILLS}/build-verify/SKILL.md")
         review = managed(f"{SKILLS}/build-review/SKILL.md")
 
-        assert "≤ 10" in verify
+        assert "≤ 6" in verify
         assert "one short sentence" in verify
-        assert "≤ 10 lines" in review
+        assert "≤ 6 lines" in review
         assert "one small paragraph" in review
 
     def test_worktree_cleanup_treats_evidence_as_disposable(self):

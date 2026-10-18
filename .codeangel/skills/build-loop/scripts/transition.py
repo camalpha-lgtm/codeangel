@@ -72,7 +72,7 @@ AUTH_HEADER_RE = re.compile(
 )
 PROOF_BEGIN = "<!-- proof:start -->"
 PROOF_END = "<!-- proof:end -->"
-PROOF_MAX_LINES = 10
+PROOF_MAX_LINES = 6
 PROOF_TITLE_CHARS = 100
 
 
@@ -251,7 +251,13 @@ def evidence_rows(spec: Spec) -> list[list[str]]:
         for line in content_lines(spec.section("Evidence"))
         if line.startswith("|") and line not in stale
     ]
-    return [[cell.strip().strip("`") for cell in line.strip("|").split("|")] for line in lines]
+    return [
+        [
+            cell.strip().strip("`") if index < 3 else cell.strip()
+            for index, cell in enumerate(line.strip("|").split("|"))
+        ]
+        for line in lines
+    ]
 
 
 def evidence_dir(ticket: str) -> Path:
@@ -855,22 +861,30 @@ def artefact_markdown(path: str) -> str:
         else ""
     )
     fence = fence_for(shown)
-    return (
-        f"<details><summary>`{name}`</summary>\n\n{fence}text\n{shown}{more}\n{fence}\n\n</details>"
-    )
+    return f"`{name}`\n{fence}text\n{shown}{more}\n{fence}"
 
 
-def row_markdown(row: list[str]) -> str:
+def row_summary(ac: str, title: str, row: list[str]) -> str:
     kind, proof = row[1].lower(), row[2]
     note = f" — {row[3]}" if len(row) > 3 and row[3] else ""
     missing = reason_after(proof, "not captured:")
     if missing is not None:
-        return f"> ⚠ **{kind}** not captured: {missing}{note}"
+        return f"- ⚠ **{ac}** — {title} — not captured ({kind}): {missing}"
     na = reason_after(proof, "n/a:")
     if na is not None:
-        return f"> n/a: {na}{note}"
-    parts = [artefact_markdown(item) for item in (p.strip() for p in proof.split(",")) if item]
-    return f"{kind}{note}\n\n" + "\n\n".join(parts)
+        return f"- ➖ **{ac}** — {title} — n/a: {na}"
+    return f"- ✅ **{ac}** — {title}{note}"
+
+
+def row_excerpts(ac: str, row: list[str]) -> list[str]:
+    proof = row[2]
+    if reason_after(proof, "not captured:") is not None or reason_after(proof, "n/a:") is not None:
+        return []
+    return [
+        f"**{ac}** {artefact_markdown(item)}"
+        for item in (part.strip() for part in proof.split(","))
+        if item
+    ]
 
 
 def short_title(rest: str) -> str:
@@ -890,15 +904,24 @@ def render_proof(spec: Spec) -> str:
     acs = acceptance_criteria(spec)
     rows = evidence_rows(spec)
     captured = sum(1 for ac in acs if any(r[0] == ac and is_captured(r) for r in rows))
+    summary, excerpts = [], []
+    for ac, rest in acs.items():
+        title = short_title(rest)
+        mine = [row for row in rows if row[0] == ac and len(row) > 2]
+        summary += [row_summary(ac, title, row) for row in mine] or [
+            f"- ⚠ **{ac}** — {title} — no evidence recorded"
+        ]
+        for row in mine:
+            excerpts += row_excerpts(ac, row)
     out = [
         PROOF_BEGIN,
         "## Proof",
         f"{captured} of {len(acs)} criteria have captured proof (evidence stays local, not committed).",
+        "\n".join(summary),
     ]
-    for ac, rest in acs.items():
-        mine = [row for row in rows if row[0] == ac and len(row) > 2]
-        body = "\n\n".join(row_markdown(row) for row in mine) or "> ⚠ no evidence recorded"
-        out.append(f"**{ac} — {short_title(rest)}**\n\n{body}")
+    if excerpts:
+        body = "\n\n".join(excerpts)
+        out.append(f"<details><summary>Output excerpts</summary>\n\n{body}\n\n</details>")
     out.append(PROOF_END)
     return "\n\n".join(out) + "\n"
 
