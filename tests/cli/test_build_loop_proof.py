@@ -97,6 +97,67 @@ class TestProofRendering:
         assert section.splitlines().index("<details><summary>Output excerpts</summary>") <= 8
         assert max(len(line) for line in section.splitlines()) <= 160
 
+    def media_spec(self, evidence: EvidenceProject):
+        shot = evidence.artefact("ac-1-ui.png", PNG)
+        clip = evidence.artefact("ac-1-ui.mp4", b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 16)
+        preview = evidence.artefact("ac-1-ui.gif", b"GIF89a" + b"\x00" * 16)
+        return evidence.spec(
+            ["- [x] AC-1: A user sees the order list [proof: ui]"],
+            [f"| AC-1 | ui | {shot}, {clip}, {preview} | the list page |"],
+        )
+
+    def test_published_screenshot_is_shown_inline(self, evidence: EvidenceProject):
+        section = evidence.module.render_proof(self.media_spec(evidence), "owner/repo", "0123abcd")
+
+        base = "https://github.com/owner/repo/blob/0123abcd/ABC-1"
+        lines = section.splitlines()
+        item = lines.index(next(line for line in lines if line.startswith("- ✅ **AC-1**")))
+        assert f"![ac-1-ui.png]({base}/ac-1-ui.png?raw=true)" in "\n".join(lines[item : item + 8])
+
+    def test_published_video_is_a_link_with_a_preview(self, evidence: EvidenceProject):
+        section = evidence.module.render_proof(self.media_spec(evidence), "owner/repo", "0123abcd")
+
+        base = "https://github.com/owner/repo/blob/0123abcd/ABC-1"
+        assert f"[▶ ac-1-ui.mp4]({base}/ac-1-ui.mp4?raw=true)" in section
+        assert f"![ac-1-ui.gif]({base}/ac-1-ui.gif?raw=true)" in section
+        assert "<video" not in section
+        assert len(section.splitlines()) <= 16
+
+    def test_unpublished_media_is_a_local_note(self, evidence: EvidenceProject):
+        section = evidence.module.render_proof(self.media_spec(evidence))
+
+        assert "`ac-1-ui.png` — screenshot kept locally, not committed" in section
+        assert "`ac-1-ui.mp4` — video kept locally, not committed" in section
+        assert "github.com" not in section
+        assert "![" not in section
+
+    def test_proof_command_accepts_repo_and_sha(self, project: Path):
+        TestProofRendering.init_ticket(self, project)
+        evidence = EvidenceProject(project)
+        shot = evidence.artefact("ac-1-ui.png", PNG)
+        spec_file = project / "docs/specs/ABC-1.md"
+        text = spec_file.read_text(encoding="utf-8").replace(
+            "ac-1-cli.txt |", f"ac-1-cli.txt, {shot} |"
+        )
+        spec_file.write_text(text, encoding="utf-8")
+        body = project / "body.md"
+        body.write_text("## Summary\nHello\n", encoding="utf-8")
+
+        result = transition(
+            project,
+            "proof",
+            "ABC-1",
+            "--repo",
+            "owner/repo",
+            "--sha",
+            "0123abcd",
+            "--into",
+            str(body),
+        )
+
+        assert result.returncode == 0, result.stdout
+        assert "/blob/0123abcd/ABC-1/ac-1-ui.png?raw=true" in body.read_text(encoding="utf-8")
+
     def test_note_keeps_its_leading_backtick(self, evidence: EvidenceProject):
         proof = evidence.artefact("ac-1-cli.txt", "ok\n")
         spec = evidence.spec(

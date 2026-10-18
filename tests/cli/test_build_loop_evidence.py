@@ -115,15 +115,17 @@ class TestEvidenceGate:
 
         assert evidence.problems(spec)
 
-    def test_image_only_row_is_refused(self, evidence: EvidenceProject):
+    def test_image_only_row_is_accepted(self, evidence: EvidenceProject):
         shot = evidence.artefact("ac-1-ui.png", PNG)
         spec = evidence.spec(["- [x] AC-1: a [proof: ui]"], [f"| AC-1 | ui | {shot} | x |"])
 
-        problems = evidence.problems(spec)
+        assert evidence.problems(spec) == []
 
-        assert len(problems) == 1
-        assert "AC-1" in problems[0]
-        assert "text capture" in problems[0]
+    def test_video_only_row_is_accepted(self, evidence: EvidenceProject):
+        clip = evidence.artefact("ac-1-ui.mp4", b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 16)
+        spec = evidence.spec(["- [x] AC-1: a [proof: ui]"], [f"| AC-1 | ui | {clip} | x |"])
+
+        assert evidence.problems(spec) == []
 
     def test_text_plus_image_row_is_accepted(self, evidence: EvidenceProject):
         shot = evidence.artefact("ac-1-ui.png", PNG)

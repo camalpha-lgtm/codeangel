@@ -124,7 +124,7 @@ entry = ["implementation in the working tree (uncommitted)", "run by an independ
 produces = [
   "§Verify reports: '### Attempt <attempt+1> — PASS|FAIL' + one line per V1–V9; per FAIL ≤ 20-line excerpt, root cause, next action",
   "on PASS: every AC ticked '- [x]', evidence 'AC-n: <test node id>; <file>:<line>' in the report",
-  "§Evidence: one row per AC (kind, artefact paths under <spec_dir>/evidence/<TICKET>/ or 'not captured: <reason>', note); the artefact files themselves, git-ignored (T evidence) and never committed",
+  "§Evidence: one row per AC (kind, artefact paths under <spec_dir>/evidence/<TICKET>/ or 'not captured: <reason>', note); the artefact files themselves, git-ignored (T evidence), never committed to the PR branch (REVIEW publishes the media with T publish)",
 ]
 
 [[stages.VERIFY.exits]]
@@ -243,7 +243,7 @@ pr_recorded = "Frontmatter pr is a URL."
 learnings_recorded = "§Learnings has ≥ 1 non-template line."
 note_required = "--note given."
 ci_flaky_once = "No ci_flaky since the last entry into REVIEW from another stage."
-evidence_recorded = "§Evidence has one row per AC; each row's kind is api, ui, cli or none; its proof is existing non-empty files under <spec_dir>/evidence/<TICKET>/ including at least one text file, 'not captured: <reason>', or (kind none, planned none) 'n/a: <reason>'; a planned api/ui/cli AC is never kind none; no credential-looking value in the section or in a text artefact; the evidence directory is git-ignored and no file in it is tracked."
+evidence_recorded = "§Evidence has one row per AC; each row's kind is api, ui, cli or none; its proof is existing non-empty files under <spec_dir>/evidence/<TICKET>/, 'not captured: <reason>', or (kind none, planned none) 'n/a: <reason>'; a planned api/ui/cli AC is never kind none; no credential-looking value in the section or in a text artefact; the evidence directory is git-ignored and no file in it is tracked."
 docs_synced = "Every doc docs/ai/doc-map.toml maps from the files changed since base_sha has a §Docs impact row; updated rows really changed, unchanged rows give a reason; changed docs have clean whitespace; Claude shims in sync when skills changed."
 
 [effects]
