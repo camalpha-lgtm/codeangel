@@ -7,13 +7,13 @@ url: https://linear.app/cam-h-personal/issue/CAM-16/keep-build-loop-proof-out-of
 branch: camerondhobbs/cam-16-keep-build-loop-proof-out-of-git-show-it-only-in-the-pr
 base_sha: ec2cb550abcbf7d6e99b877c37c07d1d07129358
 pr: https://github.com/camalpha-lgtm/codeangel/pull/6
-stage: REVIEW  # managed by transition.py — see stages.toml
-last_status: pass  # exit status that entered the current stage
+stage: DONE  # managed by transition.py — see stages.toml
+last_status: learned  # exit status that entered the current stage
 attempt: 2   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
 created: 2026-10-18T01:43Z
-updated: 2026-10-18T06:13Z
+updated: 2026-10-18T06:15Z
 ---
 
 # CAM-16: Keep build-loop proof out of git; show it only in the PR description
@@ -179,11 +179,14 @@ Files should not be added to git. Just their content of proof of acceptance crit
 
 ## Review
 - PR: https://github.com/camalpha-lgtm/codeangel/pull/6
-- CI runs: <!-- <run id> <sha> <conclusion> -->
-- Ready for review: <UTC time | not marked: reason>
+- CI runs: 39088362583 1e9f081 success · 39088950575 162227f success · 39103307224 bef6dd9 success
+- Ready for review: 2026-10-18 (PR marked ready after CI green on bef6dd9)
 
 ## Learnings
 <!-- - <area>/docs/learnings/<file>.md or <area>/docs/ai/<file>.md: <entry added/updated/deleted> | none: <why> -->
+- docs/learnings/tooling.md: added the Bash-heredoc backslash gotcha
+- docs/learnings/process.md: created; added the post-VERIFY feedback route and the minimal-proof lesson
+- docs/learnings/README.md: process.md row no longer says 'create on first entry'
 
 ## Log
 - 2026-10-18T01:43Z STARTUP → PLAN [init] attempt=0/5 — mode=immediate, branch=camerondhobbs/cam-16-keep-build-loop-proof-out-of-git-show-it-only-in-the-pr, base=ec2cb550ab
@@ -197,3 +200,5 @@ Files should not be added to git. Just their content of proof of acceptance crit
 - 2026-10-18T02:07Z REVIEW → IMPLEMENT [ci_red_code] attempt=2/5 — user feedback: PR proof still too long — one line per AC, all excerpts in one collapsed block, 6-line cap
 - 2026-10-18T02:09Z IMPLEMENT → VERIFY [implemented] attempt=2/5
 - 2026-10-18T06:13Z VERIFY → REVIEW [pass] attempt=2/5
+- 2026-10-18T06:15Z REVIEW → LEARN [ci_green] attempt=2/5
+- 2026-10-18T06:15Z LEARN → DONE [learned] attempt=2/5
