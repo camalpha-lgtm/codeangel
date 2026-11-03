@@ -10,7 +10,6 @@ ci = "| `{{area_name}}.yml` | {{area}}/: type check, lint, Android bundle export
 
 [area]
 requires_files = ["package.json"]
-pre_remove = []
 
 # create-expo-app writes Expo's own agent guidance to AGENTS.md. Keep it (Expo maintains it) as on-demand
 # reference and install the area AGENTS.md router in its place.

@@ -6,5 +6,5 @@
 - **`manage.py check` (the prek django hook) never detects schema drift → also run `makemigrations --check --dry-run`.** — src: codeangel seed
 - **prek only sees files under `{{area}}/`.** — its config lives in `{{area}}/.pre-commit-config.yaml`; docs elsewhere are covered by build-loop's doc hygiene check. src: codeangel seed
 - **The prek ruff hooks run `poetry run ruff`, so hooks and the CLI share one version.** — a pre-commit-managed ruff pinned in the config can drift from the poetry-locked one and report different findings. src: codeangel seed
-- **`poetry -C <worktree>/{{area}} env remove --all` before deleting a worktree.** — the venv name hashes the project path; once the dir is gone the venv is orphaned in poetry's cache. worktree-cleanup runs this via `[[areas]] pre_remove`. src: codeangel seed
+- **`poetry -C <worktree>/{{area}} env remove --all` before deleting a worktree.** — the venv name hashes the project path; once the dir is gone the venv is orphaned in poetry's cache. src: codeangel seed
 - **Keep CI's poetry version equal to the local one (`.github/workflows/{{area_name}}.yml`).** — the lock-file format differs between poetry major versions. src: codeangel seed

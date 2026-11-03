@@ -24,4 +24,3 @@
 
 ## Worktrees
 - Agent hosts (T3 Code, Claude Code, Codex, Cursor) may create one worktree per task; each area's `<area>/docs/ai/commands.md` lists its per-worktree setup.
-- Worktrees of merged PRs: `.codeangel/skills/worktree-cleanup/SKILL.md` (also runs at build-loop startup).

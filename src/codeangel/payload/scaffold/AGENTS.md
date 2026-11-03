@@ -16,7 +16,6 @@ root `AGENTS.md` → `AGENTS.md` of every area you touch → only the `docs/ai/`
 | when | read |
 |---|---|
 | ticket ID (`ABC-123`) or build / plan / approve / resume a ticket | `.codeangel/skills/build-loop/SKILL.md` — follow it exactly |
-| clean up worktrees, free disk | `.codeangel/skills/worktree-cleanup/SKILL.md` |
 | where something lives, which area owns it, cross-area changes | `docs/ai/repo-map.md` |
 | what to build, product scope | `docs/ai/product.md` |
 | branches, commits, PRs, CI, worktrees | `docs/ai/git-workflow.md` |

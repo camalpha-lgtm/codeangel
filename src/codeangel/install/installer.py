@@ -1,4 +1,3 @@
-import json
 import tomllib
 from pathlib import Path, PurePosixPath
 
@@ -186,16 +185,8 @@ class PresetInstaller:
         if any(entry.get("path") == area for entry in project.config.get("areas", [])):
             print(f"  kept {Paths.CONFIG}: area {area} present")
             return
-        commands = [
-            self._renderer.render(command, variables, "pre_remove")
-            for command in preset.meta.get("area", {}).get("pre_remove", [])
-        ]
-        rendered = ", ".join(json.dumps(command) for command in commands)
         name = variables["area_name"]
-        block = (
-            f'\n[[areas]]\nname = "{name}"\npath = "{area}"\npreset = "{preset_name}"\n'
-            f"pre_remove = [{rendered}]\n"
-        )
+        block = f'\n[[areas]]\nname = "{name}"\npath = "{area}"\npreset = "{preset_name}"\n'
         path = project.root / Paths.CONFIG
         text = path.read_text(encoding="utf-8").rstrip("\n") + "\n" + block
         tomllib.loads(text)

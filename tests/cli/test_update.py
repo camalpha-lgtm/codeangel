@@ -68,14 +68,14 @@ class TestUpdate:
     def test_removes_files_no_longer_shipped_unless_edited(
         self, project: Path, newer_payload: Path
     ):
-        (newer_payload / "dot_codeangel/skills/worktree-cleanup/SKILL.md").unlink()
+        (newer_payload / "dot_codeangel/skills/build-learn/SKILL.md").unlink()
         (newer_payload / "dot_claude/agents/build-verifier.md").unlink()
         edited = project / ".claude/agents/build-verifier.md"
         edited.write_text(edited.read_text(encoding="utf-8") + "\nmine\n", encoding="utf-8")
 
         assert run(project, "update") == 0
 
-        assert not (project / ".codeangel/skills/worktree-cleanup/SKILL.md").exists()
+        assert not (project / ".codeangel/skills/build-learn/SKILL.md").exists()
         assert edited.exists()
 
     def test_leaves_project_owned_files_alone(self, project: Path):
