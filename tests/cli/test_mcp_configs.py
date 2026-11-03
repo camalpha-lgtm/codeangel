@@ -13,7 +13,6 @@ CURSOR_CONFIG = ".cursor/mcp.json"
 SKILLS = PAYLOAD.managed.base / "dot_codeangel/skills"
 CONTRACT = SKILLS / "build-loop/references/contract.md"
 REVIEW = SKILLS / "build-review/SKILL.md"
-CLEANUP = SKILLS / "worktree-cleanup/SKILL.md"
 LOOP = SKILLS / "build-loop/SKILL.md"
 
 
@@ -82,12 +81,6 @@ class TestBuildLoopTooling:
             "gh run list",
         ):
             assert command not in text
-
-    def test_cleanup_lists_merged_prs_through_the_github_mcp(self):
-        text = read(CLEANUP)
-
-        assert "GitHub MCP" in text
-        assert "gh pr list" not in text
 
     def test_blocking_waits_stay_on_gh(self):
         review = read(REVIEW)

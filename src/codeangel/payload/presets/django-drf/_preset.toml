@@ -7,6 +7,3 @@ ci = "| `{{area_name}}.yml` | {{area}}/: lint (prek), schema drift, tests |"
 
 [vars]
 package = "{{project_package}}"  # Django settings package (override: --var package=<name>)
-
-[area]
-pre_remove = ["poetry -C {worktree}/{{area}} env remove --all"]

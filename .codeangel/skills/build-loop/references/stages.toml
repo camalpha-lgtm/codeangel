@@ -48,7 +48,7 @@ when = "The user abandons the ticket. --note = why."
 does = "Baseline the untouched branch, research, write the spec. No code changes."
 owner = "build-plan"
 entry = [
-  "STARTUP done: cleanup ran, workspace aligned to the Linear branch, env healthy",
+  "STARTUP done: workspace aligned to the Linear branch, env healthy",
   "spec created by `init`, or re-entered via revise / unblocked",
 ]
 produces = [

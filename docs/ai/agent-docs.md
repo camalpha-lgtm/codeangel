@@ -37,7 +37,7 @@ learning (observed gotcha) → area `docs/ai/<topic>.md` once it is a standing r
 ## Managed vs project-owned (codeangel)
 | owner | files | change how |
 |---|---|---|
-| codeangel (managed, hashes in `.codeangel/codeangel.lock.json`) | `.codeangel/skills/{build-*,worktree-cleanup}/**`, `.codeangel/sync-shims.py`, `.claude/agents/build-verifier.md`, `.mcp.json` + `.cursor/mcp.json` (Linear + GitHub MCP servers), this file | in the codeangel repo → `codeangel update` (locally edited managed files are never overwritten; the new version lands as `<file>.codeangel-new`) |
+| codeangel (managed, hashes in `.codeangel/codeangel.lock.json`) | `.codeangel/skills/build-*/**`, `.codeangel/sync-shims.py`, `.claude/agents/build-verifier.md`, `.mcp.json` + `.cursor/mcp.json` (Linear + GitHub MCP servers), this file | in the codeangel repo → `codeangel update` (locally edited managed files are never overwritten; the new version lands as `<file>.codeangel-new`) |
 | generated | `.claude/skills/*/SKILL.md` shims | never by hand → `<runtime.python> .codeangel/sync-shims.py` (or `codeangel sync`) |
 | project | `AGENTS.md` files, other `docs/ai/*`, the doc map, learnings, `README.md`, `.codeangel/codeangel.toml`, project-specific skills | edit freely; `codeangel` scaffolds them once and never touches them again |
 

@@ -72,15 +72,6 @@ class TestEvidenceProcedure:
         assert "≤ 6 lines" in review
         assert "one small paragraph" in review
 
-    def test_worktree_cleanup_treats_evidence_as_disposable(self):
-        scaffold = (PAYLOAD.scaffold.base / "dot_codeangel/codeangel.toml").read_text(
-            encoding="utf-8"
-        )
-        own = (ROOT / ".codeangel/codeangel.toml").read_text(encoding="utf-8")
-
-        assert '"evidence/"' in scaffold
-        assert '"evidence/"' in own
-
     def test_repo_installed_copy_is_current(self):
         for relative in (
             "skills/build-loop/scripts/transition.py",
