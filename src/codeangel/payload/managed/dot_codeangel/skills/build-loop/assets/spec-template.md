@@ -12,6 +12,7 @@ last_status: init  # exit status that entered the current stage
 attempt: 0   # failed VERIFY / CI cycles; forced BLOCKED at max_attempts
 blocked_stage:
 blocked_reason:
+verified_tree:
 created: <UTC ISO time>
 updated: <UTC ISO time>
 ---
@@ -48,11 +49,11 @@ updated: <UTC ISO time>
 - [non-blocking] <risk or question>
 
 ## Baseline
+<!-- Read, never measured: PLAN runs no tests, linters or builds. -->
 - base_sha: <sha>
-- gates: <per area: command → exit code; n passed, m failed; collection / build errors>
-- known failures: <test ids | none>
-- lint debt: <file: codes | none>
-- schema drift: <area / app | none>
+- source: <CI run id and conclusion on base_sha | known issue in docs/learnings | none found>
+- known failures: <test ids or checks already red on the base | none>
+- proven lazily: <VERIFY lists any failure it proved to fail on the base too, with how | none>
 
 ## Plan amendments
 <!-- - <UTC time> <what changed> — <why> -->

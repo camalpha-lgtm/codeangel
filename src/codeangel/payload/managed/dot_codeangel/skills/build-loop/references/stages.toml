@@ -45,7 +45,7 @@ when = "The user abandons the ticket. --note = why."
 # ── stages ────────────────────────────────────────────────────────────────────
 
 [stages.PLAN]
-does = "Baseline the untouched branch, research, write the spec. No code changes."
+does = "Research and write the spec. No code changes and no test, lint or build runs: the baseline is read from CI, never measured."
 owner = "build-plan"
 entry = [
   "STARTUP done: workspace aligned to the Linear branch, env healthy",
@@ -60,7 +60,7 @@ produces = [
   "§Test plan: table test-id (<file>::<name>, relative to its area) | AC ids | asserts",
   "§Docs impact: table doc | updated / unchanged | note — every doc `T docs` maps from the planned Affected files (docs/ai/doc-map.toml), plus any other doc the change makes stale; or '- none: <why>'",
   "§Risks / open questions: '[blocking]' / '[non-blocking]' items, or '- none'",
-  "§Baseline: base_sha, each touched area's gate results, known failures, lint debt, schema drift",
+  "§Baseline: base_sha, where the base's state was read from (CI run on base_sha, or none), known failures — nothing is run to produce it",
   "after the exit: local commit '<TICKET>: Plan' (spec only)",
 ]
 
@@ -104,6 +104,7 @@ entry = [
   "from fail / ci_red_code: read the latest §Verify reports attempt or §Review CI failure FIRST",
 ]
 produces = [
+  "each touched area's environment ready (its setup in docs/ai/commands.md), done here and not earlier",
   "uncommitted code + test changes limited to §Affected files",
   "schema migrations generated with the area's command when models change (never hand-written)",
   "§Plan amendments line per scope adjustment",
@@ -114,11 +115,11 @@ produces = [
 [[stages.IMPLEMENT.exits]]
 status = "implemented"
 to = "VERIFY"
-checks = ["planned_tests_exist"]
-when = "Every planned test exists and passes in a targeted run; changed files are lint-clean."
+checks = ["planned_tests_exist", "scope_within_affected", "docs_synced"]
+when = "Every planned test exists and passes in a targeted run; changed files are lint-clean, inside §Affected files (or amended), and every mapped doc has its §Docs impact row (`T scope`)."
 
 [stages.VERIFY]
-does = "Run V1–V9 against §Baseline; exercise each AC as a user would and record the proof in §Evidence."
+does = "Run V1–V9 (cheap checks first, the full suite and the running-system evidence only once those pass); exercise each AC as a user would and record the proof in §Evidence."
 owner = "build-verify"
 entry = ["implementation in the working tree (uncommitted)", "run by an independent verifier (subagent where supported): edits only the spec, never code, never commits"]
 produces = [
@@ -244,6 +245,7 @@ learnings_recorded = "§Learnings has ≥ 1 non-template line."
 note_required = "--note given."
 ci_flaky_once = "No ci_flaky since the last entry into REVIEW from another stage."
 evidence_recorded = "§Evidence has one row per AC; each row's kind is api, ui, cli or none; its proof is existing non-empty files under <spec_dir>/evidence/<TICKET>/, 'not captured: <reason>', or (kind none, planned none) 'n/a: <reason>'; a planned api/ui/cli AC is never kind none; no credential-looking value in the section or in a text artefact; the evidence directory is git-ignored and no file in it is tracked."
+scope_within_affected = "Every file changed since base_sha is listed in §Affected files (a path, a directory ending in '/', or a glob) or named in §Plan amendments; no listed path is git-ignored."
 docs_synced = "Every doc docs/ai/doc-map.toml maps from the files changed since base_sha has a §Docs impact row; updated rows really changed, unchanged rows give a reason; changed docs have clean whitespace; Claude shims in sync when skills changed."
 
 [effects]

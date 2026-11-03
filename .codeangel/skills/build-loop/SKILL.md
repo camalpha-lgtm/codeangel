@@ -57,7 +57,7 @@ BASE = `project.base_branch` from `.codeangel/codeangel.toml` (default `main`).
    | else (CUR has own commits or is pushed) | stop, ask: renaming would orphan pushed work / an open PR |
    Base freshness: OWN == 0 and HEAD ≠ `origin/<BASE>` → `git merge --ff-only origin/<BASE>`. OWN > 0 and behind → tell build-plan to record a non-blocking risk; never rebase without asking.
    Some agent hosts (e.g. T3 Code) rename fresh worktree branches → build-review re-checks the branch name before every push.
-4. **Env**: `<runtime.python> --version` is ≥ 3.11 (else fix `runtime.python` in the config — `T` needs it); each touched area's setup / health check from its `docs/ai/commands.md` passes, else set it up per that doc.
+4. **Env**: `<runtime.python> --version` is ≥ 3.11 (else fix `runtime.python` in the config — `T` needs it). Nothing else: PLAN only reads, so each area's dependencies are installed by build-implement when the ticket reaches IMPLEMENT (a ticket that stops at the plan never pays for them).
 5. **Tools**: no GitHub MCP tools (names contain `github`) and `gh auth status` fails → pass "REVIEW blocked: no GitHub MCP and gh missing / unauthenticated" to build-plan as a non-blocking risk. The CI wait and the merge watch use `gh` (see MERGE WATCH): `gh` missing → say so in the risk.
 
 ## Dispatch — repeat until a stop row

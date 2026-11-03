@@ -9,6 +9,9 @@ Project settings (spec dir, doc map, ticket pattern, areas) come from .codeangel
   go     <TICKET> <exit-status> [--note TEXT]
   log    <TICKET> TEXT             log line without a stage change
   docs   <TICKET>                  docs the change must update (docs/ai/doc-map.toml) vs §Docs impact
+  scope  <TICKET>                  changed files vs §Affected files, docs vs §Docs impact (the IMPLEMENT exit gate)
+  delta  <TICKET>                  files changed since the last VERIFY attempt (re-audit only these)
+  base   <TICKET>                  move base_sha to the merge-base with origin/<base_branch> (after merging it in)
   evidence <TICKET>                create the git-ignored evidence dir and print it
   publish <TICKET>                 push the evidence screenshots / videos to branch evidence/<TICKET>; print its sha
   proof  <TICKET> [--repo OWNER/REPO --sha SHA] [--into FILE]   render §Evidence as the PR's '## Proof' section
@@ -60,7 +63,7 @@ ATTEMPT_RE = re.compile(r"^### Attempt (\d+) [—-] (PASS|FAIL)\b", re.M)
 REVIEW_ENTRY_RE = re.compile(r"(\S+) → REVIEW \[")
 AC_LINE_RE = re.compile(r"^- \[[ xX]\] (?P<id>AC-\d+)\b(?P<rest>.*)$", re.M)
 PROOF_RE = re.compile(
-    r"\[proof: (?P<kinds>(?:api|ui|cli)(?:\s*\+\s*(?:api|ui|cli))*|none\s*[—-]\s*[^\]]+)\]"
+    r"\[proof: (?P<kinds>(?:api|ui|cli)(?:\s*\+\s*(?:api|ui|cli))*(?:\s*[—-][^\]]*)?|none\s*[—-]\s*[^\]]+)\]"
 )
 EVIDENCE_KINDS = ("api", "ui", "cli", "none")
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
@@ -233,7 +236,8 @@ def planned_kinds(rest: str) -> set[str]:
     kinds = match["kinds"]
     if kinds.startswith("none"):
         return {"none"}
-    return {kind.strip() for kind in kinds.split("+")}
+    head = re.split(r"\s*[—-]", kinds, maxsplit=1)[0]
+    return {kind.strip() for kind in head.split("+")}
 
 
 def acceptance_criteria(spec: Spec) -> dict[str, str]:
@@ -425,7 +429,7 @@ def check_planned_tests_exist(spec: Spec, note: str) -> list[str]:
         where = file.relative_to(ROOT).as_posix()
         for name in filter(None, rest.split("::")):
             name = re.sub(r"\[.*\]$", "", name)
-            if not re.search(rf"\b{re.escape(name)}\b", source):
+            if not re.search(rf"(?<!\w){re.escape(name)}(?!\w)", source):
                 problems.append(f"{row[0]}: '{name}' not found in {where}")
     return problems
 
@@ -551,6 +555,45 @@ def doc_hygiene(changed: list[str]) -> list[str]:
     return problems
 
 
+def affected_paths(spec: Spec) -> list[str]:
+    """§Affected files paths; a cell with several comma- or space-separated paths counts each."""
+    paths = []
+    for row in table_rows(spec.section("Affected files")):
+        paths += [token for token in re.split(r"[,\s]+", row[0]) if "/" in token or "." in token]
+    return paths
+
+
+def covers(allowed: str, path: str) -> bool:
+    if allowed.endswith("/"):
+        return path.startswith(allowed)
+    return path == allowed or fnmatch.fnmatchcase(path, allowed)
+
+
+def is_git_ignored(path: str) -> bool:
+    result = subprocess.run(["git", "check-ignore", "-q", "--", path], cwd=ROOT)
+    return result.returncode == 0
+
+
+def check_scope_within_affected(spec: Spec, note: str) -> list[str]:
+    try:
+        changed = changed_files(spec.get("base_sha"))
+    except UsageError as error:
+        return [str(error)]
+    allowed = affected_paths(spec)
+    amended = spec.section("Plan amendments")
+    problems = [
+        f"{path}: changed but not in §Affected files or §Plan amendments"
+        for path in changed
+        if path not in amended and not any(covers(entry, path) for entry in allowed)
+    ]
+    for entry in allowed:
+        if "*" not in entry and not entry.endswith("/") and is_git_ignored(entry):
+            problems.append(
+                f"{entry}: git-ignored, so it would never be committed (git check-ignore -v {entry})"
+            )
+    return problems
+
+
 def check_docs_synced(spec: Spec, note: str) -> list[str]:
     try:
         changed = changed_files(spec.get("base_sha"))
@@ -586,6 +629,7 @@ CHECKS: dict[str, Callable[[Spec, str], list[str]]] = {
     "note_required": check_note_required,
     "ci_flaky_once": check_ci_flaky_once,
     "docs_synced": check_docs_synced,
+    "scope_within_affected": check_scope_within_affected,
     "evidence_recorded": check_evidence_recorded,
 }
 EFFECTS = {"increment_attempt", "set_blocked", "clear_blocked", "set_mode_immediate"}
@@ -749,6 +793,8 @@ def cmd_go(args: argparse.Namespace) -> None:
         spec.set("blocked_reason", note)
     if "set_mode_immediate" in effects:
         spec.set("mode", "immediate")
+    if stage == "VERIFY" and args.status in {"pass", "fail"}:
+        spec.set("verified_tree", working_tree_hash())
     if "increment_attempt" in effects:
         attempt += 1
         if attempt >= MAP["max_attempts"]:
@@ -808,7 +854,7 @@ def cmd_docs(args: argparse.Namespace) -> None:
     _, spec = load(args.ticket)
     base = spec.get("base_sha")
     changed = changed_files(base) if base else []
-    planned = [row[0] for row in table_rows(spec.section("Affected files")) if "/" in row[0]]
+    planned = [path for path in affected_paths(spec) if "/" in path]
     impact = docs_impact(spec)
     needed = required_docs(sorted(set(changed) | set(planned)))
     print(f"{args.ticket}: {len(changed)} changed since {base[:10] or '-'}, {len(planned)} planned")
@@ -822,6 +868,57 @@ def cmd_docs(args: argparse.Namespace) -> None:
     print("docs_synced: ✓ ready" if not problems else f"docs_synced: ✗ {len(problems)} unmet")
     for problem in problems:
         print(f"  ✗ {problem}")
+
+
+def working_tree_hash() -> str:
+    """Tree object of HEAD plus every uncommitted, non-ignored change; cheap to diff against later."""
+    with tempfile.TemporaryDirectory() as scratch:
+        env = {**os.environ, "GIT_INDEX_FILE": str(Path(scratch) / "index")}
+        git_run("read-tree", "HEAD", env=env)
+        git_run("add", "--all", env=env)
+        return git_run("write-tree", env=env)
+
+
+def cmd_scope(args: argparse.Namespace) -> None:
+    _, spec = load(args.ticket)
+    problems = check_scope_within_affected(spec, "") + (
+        check_docs_synced(spec, "") if spec.get("base_sha") else ["frontmatter base_sha is empty"]
+    )
+    print("scope: ✓ ready" if not problems else f"scope: ✗ {len(problems)} unmet")
+    for problem in problems:
+        print(f"  ✗ {problem}")
+
+
+def cmd_delta(args: argparse.Namespace) -> None:
+    _, spec = load(args.ticket)
+    before = spec.get("verified_tree")
+    if not before:
+        print(f"{args.ticket}: no earlier VERIFY attempt → audit everything")
+        return
+    try:
+        changed = git_lines("diff", "--name-only", before, working_tree_hash())
+    except UsageError:
+        print(f"{args.ticket}: the last verified state is gone → audit everything")
+        return
+    spec_prefix = f"{PROJECT.get('spec_dir', 'docs/specs')}/"
+    changed = [path for path in changed if not path.startswith(spec_prefix)]
+    print(f"{args.ticket}: {len(changed)} file(s) changed since the last VERIFY attempt")
+    for path in changed:
+        print(f"  {path}")
+
+
+def cmd_base(args: argparse.Namespace) -> None:
+    path, spec = load(args.ticket)
+    target = f"origin/{PROJECT.get('base_branch', 'main')}"
+    new = git_run("merge-base", "HEAD", target)
+    old = spec.get("base_sha")
+    spec.set("base_sha", new)
+    spec.set("updated", now())
+    spec.append_log(
+        f"- {now()} {spec.get('stage')} · base_sha {old[:10] or '-'} → {new[:10]} ({target})"
+    )
+    save(path, spec)
+    print(f"{args.ticket}: base_sha {old[:10] or '-'} → {new[:10]}")
 
 
 # ── proof for the pull request ────────────────────────────────────────────────
@@ -1150,6 +1247,11 @@ def build_parser() -> argparse.ArgumentParser:
     docs = commands.add_parser("docs")
     docs.add_argument("ticket")
     docs.set_defaults(handler=cmd_docs)
+
+    for name, handler in (("scope", cmd_scope), ("delta", cmd_delta), ("base", cmd_base)):
+        simple = commands.add_parser(name)
+        simple.add_argument("ticket")
+        simple.set_defaults(handler=handler)
 
     proof_cmd = commands.add_parser("proof")
     proof_cmd.add_argument("ticket")

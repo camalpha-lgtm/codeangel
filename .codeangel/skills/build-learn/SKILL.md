@@ -10,7 +10,7 @@ metadata:
 Read first: `.codeangel/skills/build-loop/references/contract.md`, `docs/ai/agent-docs.md` (layers, learnings format, promotion). Stage block: `T show LEARN`.
 Guard: `T status <TICKET>` = LEARN; else return per contract.
 
-1. **Harvest** from the spec: FAIL attempts + root causes, CI failures, plan amendments, surprises, anything you had to discover that the AGENTS.md files / `docs/ai` / learnings didn't say, docs that proved wrong.
+1. **Harvest** from the spec: FAIL attempts + root causes, CI failures, plan amendments, surprises, anything you had to discover that the AGENTS.md files / `docs/ai` / learnings didn't say, docs that proved wrong. Every `recipe gaps` line in `## Verify reports` is a standing fact: add it to the area's `docs/ai/evidence.md` (start · seed · auth · capture, with the working commands) so the next VERIFY does not rebuild the capture tooling.
 2. **Filter**: keep only non-obvious + reusable + verified. Drop ticket narrative, anything already documented, anything obvious from a quick code read. Zero is valid → `none: <why>`.
 3. **File** in the right AREA (`docs/learnings/` for cross-cutting, `<area>/docs/learnings/` otherwise; index: `docs/learnings/README.md`): grep every learnings dir first → update / merge instead of appending; fix or delete entries this ticket disproved; delete known issues it resolved. Wrong `docs/ai` fact → fix it there.
 4. **Docs drift**: any doc that turned out wrong or stale during the ticket (README.md, any AGENTS.md, `docs/ai/*`) → fix it now. It went stale without a doc-map rule catching it → add or widen the rule in `project.doc_map` so the next change catches it.
