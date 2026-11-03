@@ -13,6 +13,9 @@
   | `T go <TICKET> <status> [--note "…"]` | the ONLY way to change stage; REFUSED (exit 1) if illegal or checks fail → fix what it lists |
   | `T log <TICKET> "<event>"` | record an event without a stage change |
   | `T docs <TICKET>` | docs the change must update (doc map) vs `## Docs impact` — the V8 gate |
+  | `T scope <TICKET>` | files changed outside `## Affected files` / `## Plan amendments`, Affected files that `.gitignore` swallows, unmapped docs — the IMPLEMENT exit gate and V6 |
+  | `T delta <TICKET>` | files changed since the last VERIFY attempt (VERIFY re-attempts audit only these) |
+  | `T base <TICKET>` | set `base_sha` to the merge-base with `origin/<base_branch>` after merging the base in (REVIEW) |
   | `T evidence <TICKET>` | create the git-ignored evidence dir and print it (VERIFY, first) |
   | `T publish <TICKET>` | push the evidence screenshots / videos to the branch `evidence/<TICKET>` (never the PR branch); print its sha (REVIEW) |
   | `T proof <TICKET> [--repo OWNER/REPO --sha SHA] [--into FILE]` | render `## Evidence` as the PR's `## Proof` block: media inline from `--sha`, short text excerpts (REVIEW) |
@@ -27,7 +30,10 @@ Stage skills: `T status <TICKET>` first. Stage ≠ the one you own → change no
 Root `AGENTS.md` → `AGENTS.md` of every area the ticket touches (`[[areas]]` in the config) → the `docs/ai` + `docs/learnings` files their routers name.
 
 ## Gates
-Each area's `AGENTS.md` → `## Done` lists its gates (lint / format on changed files, schema drift, full test suite, …); its `docs/ai/commands.md` says how to run them. Baseline = the same gates on the untouched base; VERIFY compares against it. An area without a gate for something (e.g. no schema) skips that check — say so in the report.
+Each area's `AGENTS.md` → `## Done` lists its gates (lint / format on changed files, schema drift, full test suite, …); its `docs/ai/commands.md` says how to run them. Baseline = what the base branch's CI showed at `base_sha`, read at PLAN and never measured locally: no stage runs the gates on the untouched base. VERIFY proves a failure belongs to the base only when one appears (`build-verify` → Order and cost). An area without a gate for something (e.g. no schema) skips that check — say so in the report.
+
+## Cost
+Expensive work waits for cheap work to pass. PLAN runs nothing; IMPLEMENT installs dependencies and runs targeted tests; `T scope` catches scope, ignored-file and docs-map misses before VERIFY; VERIFY runs its static checks first and the full suite and running-system evidence only once those pass, and on a re-attempt audits only what `T delta` shows changed. REVIEW merges the base branch before pushing (`T base` moves `base_sha`) so CI judges the merged tree.
 
 ## Docs move with code
 The PR that changes behaviour, structure, commands, deps, or setup also updates every doc that describes it — `README.md`, any `AGENTS.md`, `docs/ai/*`, learnings. `project.doc_map` (default `docs/ai/doc-map.toml`) says which docs describe which paths; `T docs` applies it; VERIFY refuses to pass until each mapped doc is updated or marked unchanged with a reason. A doc you notice is wrong (even unmapped) → fix it in the same change and list it in `## Docs impact`.

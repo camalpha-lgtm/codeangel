@@ -1,6 +1,6 @@
 ---
 name: build-plan
-description: "Stage PLAN of build-loop for a ticket — creates or revises the ticket's spec file — baseline of the untouched branch, research, acceptance criteria, out of scope, affected files, test plan, docs impact, risks. Run by the build-loop coordinator, or directly to (re)plan a ticket whose spec is at PLAN."
+description: "Stage PLAN of build-loop for a ticket — creates or revises the ticket's spec file — baseline read from CI (no test runs), research, acceptance criteria, out of scope, affected files, test plan, docs impact, risks. Run by the build-loop coordinator, or directly to (re)plan a ticket whose spec is at PLAN."
 argument-hint: "<TICKET>"
 ---
 
